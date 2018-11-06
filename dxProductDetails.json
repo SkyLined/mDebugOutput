@@ -1,0 +1,16 @@
+{
+  "asDependentOnProductNames": [
+  ], 
+  "oProductVersion": "2018-11-06 17:00", 
+  "oRepository": {
+    "sBranch": "master", 
+    "sRepositoryName": "mDebugOutput", 
+    "sType": "GitHub", 
+    "sUserName": "SkyLined"
+  }, 
+  "sLicenseServerURL": "https://license.skylined.nl/License_dxCheck.php", 
+  "sProductAuthor": "SkyLined", 
+  "sProductName": "mDebugOutput", 
+  "sProductURL": "https://github.com/SkyLined/mDebugOutput", 
+  "sTrialPeriodDuration": "1m"
+}
