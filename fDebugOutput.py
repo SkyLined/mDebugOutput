@@ -3,7 +3,6 @@ import threading, time;
 try:
   from oConsole import oConsole;
 except Exception as oException:
-  print repr(Exception);
   oConsole = None;
   goOutputLock = threading.Lock();
 else:
