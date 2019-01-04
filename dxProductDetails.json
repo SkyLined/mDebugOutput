@@ -12,5 +12,5 @@
   "sProductAuthor": "SkyLined", 
   "sProductName": "mDebugOutput", 
   "sProductURL": "https://github.com/SkyLined/mDebugOutput", 
-  "sTrialPeriodDuration": "1m"
+  "oTrialPeriodDuration": "1m"
 }
