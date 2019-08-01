@@ -10,7 +10,7 @@ class cWithDebugOutput(object):
       sArguments = ", ".join(["oSelf=%s" % fsToString(oSelf)] + ["%s=%s" % (sName, fsToString(xValue, 60)) for (sName, xValue) in dxArguments.items()]);
       fDebugOutput("".join([
         "%60s" % oCaller.sCallLocation,
-        "%s \xC3\xC4\xBF " % (" \xB3" * (oCaller.uStackIndex - 1)),
+        "%s \xC3\xC4\xBF " % (" \xB3" * oCaller.uStackIndex),
         "%s.%s(%s)" % (oSelf.__class__.__name__, oCaller.sCurrentFunction, sArguments),
       ]));
   
@@ -19,7 +19,7 @@ class cWithDebugOutput(object):
     if oCaller.bShowDebugOutput:
       fDebugOutput("".join([
         "%60s" % oCaller.sCurrentLocation,
-        "%s \xC3 " % (" \xB3" * oCaller.uStackIndex),
+        "%s \xC3 " % (" \xB3" * (oCaller.uStackIndex + 1)),
         "%s" % sMessage,
       ]));
   
@@ -33,7 +33,7 @@ class cWithDebugOutput(object):
     if oCaller.bShowDebugOutput:
       fDebugOutput("".join([
         "%60s" % oCaller.sCurrentLocation,
-        "%s \xC3\xC4\xD9 " % (" \xB3" * (oCaller.uStackIndex - 1)),
+        "%s \xC3\xC4\xD9 " % (" \xB3" * oCaller.uStackIndex),
         "%s.%s" % (oSelf.__class__.__name__, oCaller.sCurrentFunction),
         " <\xCD %s" % fsToString(xReturnValue, 200) if bShowReturnValue else "",
         " (%s)" % sDetails if sDetails else "",
@@ -50,7 +50,7 @@ class cWithDebugOutput(object):
     if oCaller.bShowDebugOutput:
       fDebugOutput("".join([
         "%60s" % oCaller.sCurrentLocation,
-        "%s\xC4\xD9 " % (" \xB3" * oCaller.uStackIndex),
+        "%s\xC4\xD9 " % (" \xB3" * (oCaller.uStackIndex + 1)),
         "!! %s" % fsToString(oException, 200),
       ]));
     return oException;
