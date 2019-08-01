@@ -31,6 +31,7 @@ class cStack(object):
   doStack_by_uThreadId = {};
   
   __asShowDebugOutputForFilePaths = [];
+  bShowAllOutput = False;
   
   @staticmethod
   def fShowFileDebugOutput(sFilePath):
@@ -42,7 +43,7 @@ class cStack(object):
   
   @staticmethod
   def fbShowDebugOutputForEntry(oStackEntry):
-    return oStackEntry.sFilePath in cStack.__asShowDebugOutputForFilePaths;
+    return cStack.bShowAllOutput or oStackEntry.sFilePath in cStack.__asShowDebugOutputForFilePaths;
   
   @staticmethod
   def foGetThreadStack():
