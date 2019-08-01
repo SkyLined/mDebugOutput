@@ -6,11 +6,11 @@ from .cStack import cStack;
 fShowFileDebugOutput = cStack.fShowFileDebugOutput;
 fShowFileDebugOutputForClass = cStack.fShowFileDebugOutputForClass;
 
-def fShowAllOutput():
-  cStack.bShowAllOutput = True;
+def fShowAllDebugOutput(bShowAllOutput = True):
+  cStack.bShowAllOutput = bShowAllOutput;
 
 all = [
-  fShowAllOutput,
+  fShowAllDebugOutput,
   fShowFileDebugOutput,
   fShowFileDebugOutputForClass,
   cStack,
