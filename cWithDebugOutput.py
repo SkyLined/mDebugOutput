@@ -20,7 +20,7 @@ class cWithDebugOutput(object):
       fDebugOutput("".join([
         "%60s" % oCaller.sCurrentLocation,
         "%s \xC3 " % (" \xB3" * (oCaller.uStackIndex + 1)),
-        "%s" % sMessage,
+        "%s" % sMessage if isinstance(sMessage, (str, unicode)) else repr(sMessage),
       ]));
   
   def fExitFunctionOutput(oSelf, sDetails = None):
@@ -36,7 +36,7 @@ class cWithDebugOutput(object):
         "%s \xC3\xC4\xD9 " % (" \xB3" * oCaller.uStackIndex),
         "%s.%s" % (oSelf.__class__.__name__, oCaller.sCurrentFunction),
         " <\xCD %s" % fsToString(xReturnValue, 200) if bShowReturnValue else "",
-        " (%s)" % sDetails if sDetails else "",
+        " (%s)" % (sDetails if isinstance(sDetails, (str, unicode)) else repr(sDetails)) if sDetails else "",
       ]));
   
   def fxRaiseExceptionOutput(oSelf, oException):
