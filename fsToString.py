@@ -2,6 +2,8 @@
 def fsToString(xData, uMaxLength = None):
   if isinstance(xData, cWithDebugOutput):
     sData = xData.fsToString();
+    assert isinstance(sData, str), \
+        "%s.fsToString() returns %s" % (repr(xData), repr(sData));
   elif isinstance(xData, tuple):
     sData = "(%s)" % ", ".join([fsToString(xComponent, uMaxLength and uMaxLength >> 1) for xComponent in xData]);
   elif isinstance(xData, list):
