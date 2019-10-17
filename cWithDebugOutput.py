@@ -7,13 +7,14 @@ class cWithDebugOutput(object):
   def fEnterFunctionOutput(oSelf, **dxArguments):
     oCaller = cStack.foPushCaller(uCallerIndex = 0);
     if oCaller.bShowDebugOutput:
-      sArguments = ", ".join(["oSelf=%s" % fsToString(oSelf)] + ["%s=%s" % (sName, fsToString(xValue, 60)) for (sName, xValue) in dxArguments.items()]);
       fDebugOutput("".join([
         "%60s" % oCaller.sCallLocation,
         "%s \xC3\xC4\xBF " % (" \xB3" * oCaller.uStackIndex),
-        "%s.%s(%s)" % (oSelf.__class__.__name__, oCaller.sCurrentFunction, sArguments),
+        "%s.%s(%s)" % (oSelf.__class__.__name__, oCaller.sCurrentFunction, ", ".join(
+          ["oSelf=%s" % fsToString(oSelf)] +
+          ["%s=%s" % (sName, fsToString(xValue, 60)) for (sName, xValue) in dxArguments.items()]
+        )),
       ]));
-  
   def fStatusOutput(oSelf, sMessage, bCalledFromSubFunction = False, bVerbose = True):
     oCaller = cStack.foGetCaller(uCallerIndex = 1 if bCalledFromSubFunction else 0);
     if oCaller.bShowDebugOutput:
