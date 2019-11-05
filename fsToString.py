@@ -2,6 +2,8 @@
 def fsToString(xData, uMaxLength = None):
   if isinstance(xData, cWithDebugOutput):
     sData = xData.fsToString();
+    if isinstance(sData, unicode):
+      sData = sData.encode("ascii", "replace");
     assert isinstance(sData, str), \
         "%s.fsToString() returns %s" % (repr(xData), repr(sData));
   elif isinstance(xData, tuple):
