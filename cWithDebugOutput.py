@@ -11,7 +11,7 @@ class cWithDebugOutput(object):
         "%60s" % oCaller.sCallLocation,
         "%s \xC3\xC4\xBF " % (" \xB3" * oCaller.uStackIndex),
         "%s.%s(%s)" % (oSelf.__class__.__name__, oCaller.sCurrentFunction, ", ".join(
-          ["oSelf=%s" % fsToString(oSelf)] +
+          ["oSelf=%s" % (fsToString(oSelf) if oCaller.sCurrentFunction != "__init__" else "...")] +
           ["%s=%s" % (sName, fsToString(xValue, 60)) for (sName, xValue) in dxArguments.items()]
         )),
       ]));
