@@ -1,3 +1,4 @@
+import sys;
 from .cStack import cStack;
 from .fDebugOutput import fDebugOutput;
 from .fFatalExceptionOutput import fFatalExceptionOutput;
@@ -47,7 +48,7 @@ class cWithDebugOutput(object):
     oSelf.__fExceptionOutput(oException);
     fFatalExceptionOutput(oException);
   def __fExceptionOutput(oSelf, oException):
-    oCaller = cStack.foPopCaller(uCallerIndex = 1);
+    oCaller = cStack.foPopCaller(uCallerIndex = 1, bMayHaveBeenPoppedAlready = True);
     if oCaller.bShowDebugOutput:
       fDebugOutput("".join([
         "%60s" % oCaller.sCurrentLocation,

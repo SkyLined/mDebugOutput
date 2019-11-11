@@ -1,5 +1,7 @@
 import os, re, sys, threading, traceback;
 
+from .fDebugOutput import fDebugOutput;
+
 class cStackEntry(object):
   def __init__(oSelf, uCallerIndex, uStackIndex, uThreadId):
     oSelf.uStackIndex = uStackIndex;
@@ -8,6 +10,16 @@ class cStackEntry(object):
     atsStack = traceback.extract_stack(limit = 3 + uCallerIndex + 1);
     (sCallersCallerFilePath, uCallersCallerLineNumber, sCallersCallerFunctionName, sCallersCallerSource) = atsStack[0];
     (sCallerFilePath, uCallerLineNumber, sCallerFunctionName, sCallerSource) = atsStack[1];
+    
+    txExceptionInfo = sys.exc_info();
+    if txExceptionInfo[2] is not None:
+      oTraceback = txExceptionInfo[2];
+#      oFrame = oTraceback.tb_frame;
+#      oCode = oTraceback.tb_frame;
+      uCallerLineNumber = oTraceback.tb_lineno;
+#      for sName in dir(oFrame):
+#        if sName[:1] != "_":
+#          print "%s=%s" % (repr(sName), repr(getattr(oFrame, sName)));
     
     # sCallingFunction identifies the function that made the call that created this stack entry.
     oSelf.sCallingFunction = sCallersCallerFunctionName;
@@ -68,9 +80,9 @@ class cStack(object):
     return oStack.__foGetCaller(uCallerIndex + 1);
   
   @staticmethod
-  def foPopCaller(uCallerIndex):
+  def foPopCaller(uCallerIndex, bMayHaveBeenPoppedAlready = False):
     oStack = cStack.foGetThreadStack();
-    oCaller = oStack.__foPopCaller(uCallerIndex + 1);
+    oCaller = oStack.__foPopCaller(uCallerIndex + 1, bMayHaveBeenPoppedAlready);
     if len(oStack.aoStackEntries) == 0:
       cStack.oThreadStacksLock.acquire();
       try:
@@ -99,12 +111,21 @@ class cStack(object):
         "%s != %s" % (oCaller.sId, oLastCaller.sId);
     return oCaller;
   
-  def __foPopCaller(oSelf, uCallerIndex):
+  def __foPopCaller(oSelf, uCallerIndex, bMayHaveBeenPoppedAlready):
     oCaller = cStackEntry(uCallerIndex + 1, oSelf.uVisibleStackEntries - 1, oSelf.uThreadId);
     if oSelf.fbShowDebugOutputForEntry(oCaller):
       oSelf.uVisibleStackEntries -= 1;
-    oLastCaller = oSelf.aoStackEntries.pop();
-    assert oCaller.sId == oLastCaller.sId, \
-        "%s != %s" % (oCaller.sId, oLastCaller.sId);
+    # Sanity check the stack
+    uIndex = len(oSelf.aoStackEntries) - 1;
+    while uIndex >= 0 and oSelf.aoStackEntries[uIndex].sId != oCaller.sId:
+      uIndex -= 1;
+    if uIndex < 0:
+      if not bMayHaveBeenPoppedAlready:
+        fDebugOutput("<<<INTERNAL ERROR: %s is no longer on the stack" % oCaller.sId);
+    else:
+      while len(oSelf.aoStackEntries) > uIndex + 1:
+        oDroppedCaller = oSelf.aoStackEntries.pop();
+        fDebugOutput("<<<INTERNAL ERROR: %s appears to be on the stack superfluously" % oDroppedCaller.sId);
+      oSelf.aoStackEntries.pop();
     return oCaller;
   
