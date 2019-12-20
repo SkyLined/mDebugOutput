@@ -1,4 +1,3 @@
-import sys;
 from .cStack import cStack;
 from .fDebugOutput import fDebugOutput;
 from .fFatalExceptionOutput import fFatalExceptionOutput;

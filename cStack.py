@@ -1,4 +1,4 @@
-import os, re, sys, threading, traceback;
+import os, sys, threading, traceback;
 
 from .fDebugOutput import fDebugOutput;
 
