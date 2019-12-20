@@ -1,8 +1,8 @@
 import os, sys, threading, traceback;
 
 def fFatalExceptionOutput(oException):
-  cException, oException, oTraceBack = sys.exc_info();
-  assert oException == oException, \
+  cException, oException2, oTraceBack = sys.exc_info();
+  assert oException == oException2, \
       "Wrong exception!?";
   oThread = threading.currentThread();
   atxStack = traceback.extract_tb(oTraceBack);
