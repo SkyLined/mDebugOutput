@@ -9,13 +9,13 @@ fShowFileDebugOutputForClass = cStack.fShowFileDebugOutputForClass;
 def fShowAllDebugOutput(bShowAllOutput = True):
   cStack.bShowAllOutput = bShowAllOutput;
 
-all = [
-  fShowAllDebugOutput,
-  fShowFileDebugOutput,
-  fShowFileDebugOutputForClass,
-  cStack,
-  cWithDebugOutput,
-  fsToString,
-  fFatalExceptionOutput,
-  fDebugOutput,
+__all__ = [
+  "fShowAllDebugOutput",
+  "fShowFileDebugOutput",
+  "fShowFileDebugOutputForClass",
+  "cStack",
+  "cWithDebugOutput",
+  "fsToString",
+  "fFatalExceptionOutput",
+  "fDebugOutput",
 ];
