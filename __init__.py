@@ -1,21 +1,21 @@
-from .fDebugOutput import fDebugOutput;
-from .fFatalExceptionOutput import fFatalExceptionOutput;
+from .cCallStack import cCallStack;
 from .fsToString import fsToString;
-from .cWithDebugOutput import cWithDebugOutput;
-from .cStack import cStack;
-fShowFileDebugOutput = cStack.fShowFileDebugOutput;
-fShowFileDebugOutputForClass = cStack.fShowFileDebugOutputForClass;
-
-def fShowAllDebugOutput(bShowAllOutput = True):
-  cStack.bShowAllOutput = bShowAllOutput;
+from .fTerminateWithConsoleOutput import fTerminateWithConsoleOutput;
+from .fTerminateWithDeadlock import fTerminateWithDeadlock;
+from .fTerminateWithException import fTerminateWithException;
+from .fShowDebugOutput import fShowDebugOutput;
+from .fEnableDebugOutputForClass import fEnableDebugOutputForClass;
+from .fEnableDebugOutputForModule import fEnableDebugOutputForModule;
+from .ShowDebugOutput import ShowDebugOutput;
 
 __all__ = [
-  "fShowAllDebugOutput",
-  "fShowFileDebugOutput",
-  "fShowFileDebugOutputForClass",
-  "cStack",
-  "cWithDebugOutput",
+  "cCallStack",
   "fsToString",
-  "fFatalExceptionOutput",
-  "fDebugOutput",
+  "fTerminateWithConsoleOutput",
+  "fTerminateWithDeadlock",
+  "fTerminateWithException",
+  "ShowDebugOutput",
+  "fShowDebugOutput",
+  "fEnableDebugOutputForClass",
+  "fEnableDebugOutputForModule",
 ];
