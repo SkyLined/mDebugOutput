@@ -2,6 +2,7 @@ guBoxColor = 0x0F04;
 guBoxTitleColor = 0x0F0C;
 guExceptionInformationColor = 0x0F07;
 guExceptionInformationHighlightColor = 0x0F0F;
+guExceptionInformationErrorColor = 0x10F0C;
 guLineNumberColor = 0x0F08;
 
 guStackHeaderColor = 0x0F07;

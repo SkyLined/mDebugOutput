@@ -174,3 +174,8 @@ def ShowDebugOutput(fxFunction):
   fxFunctionWrapper.fxWrappedFunction = fxFunction;
   ShowDebugOutput.oFunctionWrapperCode = fxFunctionWrapper.__code__;
   return fxFunctionWrapper;
+
+# ShowDebugOutput should have an attribute "oFunctionWrapperCode" for
+# fTerminateWithException to use. This attribute will be set the first time we
+# use ShowDebugOutput, so let's do that with a dummy function:
+ShowDebugOutput(lambda: 0);
