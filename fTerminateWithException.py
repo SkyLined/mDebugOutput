@@ -10,6 +10,7 @@ from .mColors import *;
 from .ftxGetFunctionsMethodInstanceAndClassForPythonCode import ftxGetFunctionsMethodInstanceAndClassForPythonCode;
 
 from oConsole import oConsole;
+guMaxNumberOfLocalVariablesToShow = 40;
 
 @HideInCallStack
 def fTerminateWithException(oException, aasAdditionalConsoleOutputLines = None, bShowStacksForAllThread = False):
@@ -299,12 +300,24 @@ def fTerminateWithException(oException, aasAdditionalConsoleOutputLines = None, 
       [],
       [guExceptionInformationColor, "Local variables:"],
     ]
-    for sName in sorted(oStack.oTopFrame.dxLocalVariables.keys()):
+    asLocalVariableNames = sorted(oStack.oTopFrame.dxLocalVariables.keys(), key = str.lower);
+    if len(asLocalVariableNames) > guMaxNumberOfLocalVariablesToShow:
+      # Try to filter out constants by removing all variables whose names is IN_ALL_CAPS:
+      asLocalVariableNames = [sLocalVariableName for sLocalVariableName in asLocalVariableNames if sLocalVariableName.upper() != sLocalVariableName];
+    bTooManyLocalVariables = len(asLocalVariableNames) > guMaxNumberOfLocalVariablesToShow;
+    for sName in asLocalVariableNames[:guMaxNumberOfLocalVariablesToShow]:
       xValue = oStack.oTopFrame.dxLocalVariables[sName];
       aasConsoleOutputLines += [
         ["  ", guExceptionInformationHighlightColor, sName, guExceptionInformationColor, " = ", fsToString(xValue)],
       ];
-      
+    if bTooManyLocalVariables:
+      aasConsoleOutputLines += [
+        [
+          guExceptionInformationColor, "  (... ", 
+          guExceptionInformationHighlightColor, str(len(asLocalVariableNames) - guMaxNumberOfLocalVariablesToShow),
+          guExceptionInformationColor, " variables not shown...)",
+        ],
+      ];
   if aasAdditionalConsoleOutputLines is not None:
     aasConsoleOutputLines += [
       [],
