@@ -1,4 +1,5 @@
 from mGlobals import *;
 
 def fEnableAllDebugOutput():
-  gbAllDebugOutputEnabled = True;
+  global gabAllDebugOutputEnabled;
+  gabAllDebugOutputEnabled[0] = True;
