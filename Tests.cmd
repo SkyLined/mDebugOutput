@@ -14,7 +14,7 @@ IF DEFINED PYTHON (
   )
 )
 
-%PYTHON% "%~dpn0.py" %*
+%PYTHON% "%~dpn0\%~n0.py" %*
 ENDLOCAL & EXIT /B %ERRORLEVEL%
 
 :CHECK_PYTHON
