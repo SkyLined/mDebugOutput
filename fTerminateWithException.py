@@ -23,7 +23,7 @@ def fTerminateWithException(oException, aasAdditionalConsoleOutputLines = None, 
     
   sBoxTitle = "Fatal %s.%s Exception" % (oException.__class__.__module__, oException.__class__.__name__);
   aasConsoleOutputLines = None;
-  bShowLocals = False;
+  bShowLocals = True;
   if isinstance(oException, SyntaxError):
     aasConsoleOutputLines = [
       [
@@ -43,6 +43,7 @@ def fTerminateWithException(oException, aasAdditionalConsoleOutputLines = None, 
       "print_file_and_line": None,
       "text": oException.text,
     };
+    bShowLocals = False;
   elif isinstance(oException, AttributeError):
     oErrorMessageMatch = re.match(r"^'(\w+)' object has no attribute '(\w+)'$", oException.message);
     if oErrorMessageMatch:
@@ -58,7 +59,6 @@ def fTerminateWithException(oException, aasAdditionalConsoleOutputLines = None, 
         "message": oException.message,
         "args": (oException.message,),
       }; 
-    bShowLocals = True;
   elif isinstance(oException, AssertionError):
     aasConsoleOutputLines = [
       [
@@ -69,7 +69,6 @@ def fTerminateWithException(oException, aasAdditionalConsoleOutputLines = None, 
       "message": oException.message,
       "args": (oException.message,),
     };
-    bShowLocals = True;
   elif isinstance(oException, ImportError):
     oErrorMessageMatch = re.match(r"^cannot import name (\w+)$", oException.message);
     if oErrorMessageMatch:
@@ -84,8 +83,8 @@ def fTerminateWithException(oException, aasAdditionalConsoleOutputLines = None, 
         "message": oException.message,
         "args": (oException.message,),
       }; 
+    bShowLocals = False;
   elif isinstance(oException, TypeError):
-    bShowLocals = True;
     oBadKeywordArgumentErrorMessageMatch = re.match(r"^([_\w]+)\(\) got an unexpected keyword argument '([_\w]+)'$", oException.message);
     oBadNumberOfArgumentsErrorMessageMatch = re.match(r"^([\_\w]+)\(\) takes (?:at least|at most|exactly) \d+ arguments? \((\d+) given\)$", oException.message);
     if oBadKeywordArgumentErrorMessageMatch or oBadNumberOfArgumentsErrorMessageMatch:
@@ -182,7 +181,6 @@ def fTerminateWithException(oException, aasAdditionalConsoleOutputLines = None, 
         "message": oException.message,
         "args": (oException.message,),
       }; 
-    bShowLocals = True;
   elif isinstance(oException, UnboundLocalError):
     oUninitializedVariableErrorMessageMatch = re.match(r"^local variable '([_\w]+)' referenced before assignment$", oException.message);
     if oUninitializedVariableErrorMessageMatch:
@@ -198,7 +196,6 @@ def fTerminateWithException(oException, aasAdditionalConsoleOutputLines = None, 
         "message": oException.message,
         "args": (oException.message,),
       }; 
-    bShowLocals = True;
   elif isinstance(oException, UnicodeDecodeError):
     sInputString = oException.object;
     sOffensiveChars = sInputString[oException.start: oException.end];
@@ -256,8 +253,6 @@ def fTerminateWithException(oException, aasAdditionalConsoleOutputLines = None, 
       "reason": oException.reason,
       "start": oException.start,
     };
-  elif isinstance(oException, ValueError):
-    bShowLocals = True;
   if not aasConsoleOutputLines:
     aasConsoleOutputLines = [
       [guExceptionInformationColor, "Exception attributes:"],
