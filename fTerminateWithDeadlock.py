@@ -6,7 +6,6 @@ from .fsToString import fsToString;
 from .fTerminateWithConsoleOutput import fTerminateWithConsoleOutput;
 from .mColors import *;
 
-from oConsole import oConsole;
 
 def fTerminateWithDeadlock(sMessage = None, aasConsoleOutputLines = None, uDeadlockedWithThreadId = None):
   oPythonThread = threading.currentThread();

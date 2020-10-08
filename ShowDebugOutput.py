@@ -1,14 +1,4 @@
 import functools, inspect, threading, time;
-from .cCallStack import cCallStack;
-from .fbIsDebugOutputEnabledForSourceFilePathAndClass import fbIsDebugOutputEnabledForSourceFilePathAndClass;
-from .fDebugOutputHelper import fDebugOutputHelper;
-from .fsGetClassAndFunctionForClassAndCode import fsGetClassAndFunctionForClassAndCode;
-from .fsToString import fsToString;
-from .fTerminateWithException import fTerminateWithException;
-from .ftocGetInstanceAndClassForUnknown import ftocGetInstanceAndClassForUnknown;
-from .ftxGetFunctionsMethodInstanceAndClassForPythonCode import ftxGetFunctionsMethodInstanceAndClassForPythonCode;
-from HideInCallStack import HideInCallStack;
-from mGlobals import *;
 
 gbShowInternalDebugOutput = False;
 guExceptionAsStringMaxSize = 400;
@@ -174,6 +164,17 @@ def ShowDebugOutput(fxFunction):
   fxFunctionWrapper.fxWrappedFunction = fxFunction;
   ShowDebugOutput.oFunctionWrapperCode = fxFunctionWrapper.__code__;
   return fxFunctionWrapper;
+
+from .cCallStack import cCallStack;
+from .fbIsDebugOutputEnabledForSourceFilePathAndClass import fbIsDebugOutputEnabledForSourceFilePathAndClass;
+from .fDebugOutputHelper import fDebugOutputHelper;
+from .fsGetClassAndFunctionForClassAndCode import fsGetClassAndFunctionForClassAndCode;
+from .fsToString import fsToString;
+from .fTerminateWithException import fTerminateWithException;
+from .ftocGetInstanceAndClassForUnknown import ftocGetInstanceAndClassForUnknown;
+from .ftxGetFunctionsMethodInstanceAndClassForPythonCode import ftxGetFunctionsMethodInstanceAndClassForPythonCode;
+from .HideInCallStack import HideInCallStack;
+from .mGlobals import *;
 
 # ShowDebugOutput should have an attribute "oFunctionWrapperCode" for
 # fTerminateWithException to use. This attribute will be set the first time we
