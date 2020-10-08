@@ -118,6 +118,15 @@ class cCallStack():
       # A call to this function will be at the top of the stack, so we need to skip that to get to our caller.
       uEndIndex += 1;
       oTraceback = sys.exc_info()[2];
+      return cClass.foFromTracebackAndPythonThread(oTraceback, threading.currentThread(), uEndIndex);
+    
+    @classmethod
+    @HideInCallStack
+    def foFromTracebackAndPythonThread(cClass, oTraceback, oPythonThread, uEndIndex = 0):
+      if oPythonThread == threading.currentThread():
+        # If the traceback is for the current thread, a call to this function will be at the
+        # top of the stack, so we need to skip that to get to our caller.
+        uEndIndex += 1;
       if gbDebugDumpRawStacksAndTracebacks:
         print "--[ Traceback ]".ljust(80, "-");
         fDumpTraceback(oTraceback, sPrefix = "| ");
@@ -127,7 +136,7 @@ class cCallStack():
         uEndIndex -= 1;
       return cClass.foFromPythonFrameThreadAndExceptionLineNumber(
         oPythonFrame = oTraceback.tb_frame,
-        oPythonThread = threading.currentThread(),
+        oPythonThread = oPythonThread,
         uExceptionLineNumber = oTraceback.tb_lineno,
       );
     
