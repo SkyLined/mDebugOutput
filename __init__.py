@@ -1,4 +1,5 @@
 from .cCallStack import cCallStack;
+from .fConsoleOutputExceptionDetails import fConsoleOutputExceptionDetails;
 from .fEnableAllDebugOutput import fEnableAllDebugOutput;
 from .fEnableDebugOutputForClass import fEnableDebugOutputForClass;
 from .fEnableDebugOutputForModule import fEnableDebugOutputForModule;
@@ -11,6 +12,7 @@ from .ShowDebugOutput import ShowDebugOutput;
 
 __all__ = [
   "cCallStack",
+  "fConsoleOutputExceptionDetails",
   "fEnableAllDebugOutput",
   "fEnableDebugOutputForClass",
   "fEnableDebugOutputForModule",
