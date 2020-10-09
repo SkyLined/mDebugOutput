@@ -23,3 +23,5 @@ __all__ = [
   "fTerminateWithException",
   "ShowDebugOutput",
 ];
+
+from oConsole import oConsole;

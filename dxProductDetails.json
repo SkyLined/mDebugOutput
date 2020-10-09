@@ -3,7 +3,9 @@
     "oConsole", 
     "mWindowsSDK"
   ], 
-  "asOptionalProductNames": [], 
+  "asOptionalProductNames": [
+    "cFileSystemItem"
+  ], 
   "oProductVersion": "2020-06-22 15:56", 
   "oRepository": {
     "sBranch": "master", 
