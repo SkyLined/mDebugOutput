@@ -49,12 +49,12 @@ class cCallStack():
   class cFrame():
     @classmethod
     @HideInCallStack
-    def foFromPythonFrameThreadAndExceptionLineNumber(cClass, oPythonFrame, oPythonThread, uExceptionLineNumber):
+    def foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(cClass, oPythonFrame, oPythonThread, u0ExceptionLineNumber, u0ExceptionCharacterNumber):
       oPythonCode = oPythonFrame.f_code;
       uLastExecutedLineNumber = oPythonFrame.f_lineno;
       (tsArgumentNames, stxArgumentsName, sdxArgumentsName, dxLocalVariables) = inspect.getargvalues(oPythonFrame);
       return cClass(
-        oPythonCode, uExceptionLineNumber, uLastExecutedLineNumber,
+        oPythonCode, u0ExceptionLineNumber, u0ExceptionCharacterNumber, uLastExecutedLineNumber,
         oPythonThread, 
         tsArgumentNames, stxArgumentsName, sdxArgumentsName, dxLocalVariables
       );
@@ -98,7 +98,7 @@ class cCallStack():
             uIndex += 1;
         print "-" * 80;
       oPythonThread = threading.currentThread();
-      return cClass.foFromPythonFrameThreadAndExceptionLineNumber(oWantedPythonFrame, oPythonThread, None);
+      return cClass.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(oWantedPythonFrame, oPythonThread, None, None);
     
     @classmethod
     @HideInCallStack
@@ -134,21 +134,23 @@ class cCallStack():
       while uEndIndex > 0 and oTraceback.tb_next:
         oTraceback = oTraceback.tb_next;
         uEndIndex -= 1;
-      return cClass.foFromPythonFrameThreadAndExceptionLineNumber(
+      return cClass.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(
         oPythonFrame = oTraceback.tb_frame,
         oPythonThread = oPythonThread,
-        uExceptionLineNumber = oTraceback.tb_lineno,
+        u0ExceptionLineNumber = oTraceback.tb_lineno,
+        u0ExceptionCharacterNumber = None,
       );
     
     def __init__(
       oSelf,
-      oPythonCode, uExceptionLineNumber, uLastExecutedLineNumber,
+      oPythonCode, u0ExceptionLineNumber, u0ExceptionCharacterNumber, uLastExecutedLineNumber,
       oPythonThread, 
       tsArgumentNames, stxArgumentsName, sdxArgumentsName, dxLocalVariables,
     ):
       oSelf.oPythonCode = oPythonCode;
-      oSelf.uLineNumber = uExceptionLineNumber if uExceptionLineNumber is not None else uLastExecutedLineNumber;
-      oSelf.uExceptionLineNumber = uExceptionLineNumber;
+      oSelf.uLineNumber = u0ExceptionLineNumber if u0ExceptionLineNumber is not None else uLastExecutedLineNumber;
+      oSelf.u0ExceptionCharacterNumber = u0ExceptionCharacterNumber;
+      oSelf.u0ExceptionLineNumber = u0ExceptionLineNumber;
       oSelf.uLastExecutedLineNumber = uLastExecutedLineNumber;
       oSelf.uThreadId = oPythonThread.ident;
       oSelf.sThreadName = oPythonThread.name;
@@ -256,7 +258,9 @@ class cCallStack():
     
     @property
     def sExceptionCodeLocation(oSelf):
-      return "%s/%d" % (oSelf.sSourceFilePath, oSelf.uExceptionLineNumber);
+      assert oSelf.u0ExceptionLineNumber is not None, \
+          "This frame does not appear to be for an exception, as there is no exception line number specified!";
+      return "%s/%d" % (oSelf.sSourceFilePath, oSelf.u0ExceptionLineNumber);
     @property
     def sLastExecutedCodeLocation(oSelf):
       return "%s/%d" % (oSelf.sSourceFilePath, oSelf.uLastExecutedLineNumber);
@@ -293,11 +297,11 @@ class cCallStack():
       uInactiveCodeColor = guStackNormalInactiveSourceCodeColor,
       uActiveCodeColor = guStackNormalActiveSourceCodeColor,
     ):
-      assert oSelf.uExceptionLineNumber is not None, \
-          "Cannot create console output for exception source code if no exception took place!";
+      assert oSelf.u0ExceptionLineNumber is not None, \
+          "This frame does not appear to be for an exception, as there is no exception line number specified!";
       return faasCreateConsoleOutputForSourceCode(
         oSelf.sSourceFilePath,
-        oSelf.uExceptionLineNumber - 1, oSelf.uExceptionLineNumber + 1,
+        oSelf.u0ExceptionLineNumber - 1, oSelf.u0ExceptionLineNumber + 1,
         axOutputHeader,
         uLineNumberColor,
         uInactiveCodeColor, uActiveCodeColor,
@@ -319,7 +323,9 @@ class cCallStack():
     
     @property
     def sExceptionSourceCode(oSelf):
-      return oSelf.asModuleSourceCode[oSelf.uExceptionLineNumber - 1];
+      assert oSelf.u0ExceptionLineNumber is not None, \
+          "This frame does not appear to be for an exception, as there is no exception line number specified!";
+      return oSelf.asModuleSourceCode[oSelf.u0ExceptionLineNumber - 1];
     
     @property
     def sLastExecutedSourceCode(oSelf):
@@ -332,8 +338,10 @@ class cCallStack():
       return oSelf.asModuleSourceCode[uStartIndex: uEndIndex];
 
     def fasGetExceptionSourceLines(oSelf, uStartOffset = 0, uEndOffset = 1):
-      uStartIndex = max(0, oSelf.uExceptionLineNumber - 1 + uStartOffset);
-      uEndIndex = max(0, oSelf.uExceptionLineNumber + uEndOffset - 1);
+      assert oSelf.u0ExceptionLineNumber is not None, \
+          "This frame does not appear to be for an exception, as there is no exception line number specified!";
+      uStartIndex = max(0, oSelf.u0ExceptionLineNumber - 1 + uStartOffset);
+      uEndIndex = max(0, oSelf.u0ExceptionLineNumber + uEndOffset - 1);
       if uStartIndex >= uEndIndex: return [];
       return oSelf.asModuleSourceCode[uStartIndex: uEndIndex];
 
@@ -351,20 +359,20 @@ class cCallStack():
       return "<%s#%X %s/%s @ %s, thread = %d/0x%X (%s)>" % (
         oSelf.__class__.__name__, id(oSelf),
         oSelf.sCallDescription, 
-        "%d" % oSelf.uLastExecutedLineNumber if oSelf.uExceptionLineNumber is None else
-          "*%d" if oSelf.uLastExecutedLineNumber == oSelf.uExceptionLineNumber else
-          "*%d/%d" % (oSelf.uExceptionLineNumber, oSelf.uLastExecutedLineNumber),
+        "%d" % oSelf.uLastExecutedLineNumber if oSelf.u0ExceptionLineNumber is None else
+          "*%d" if oSelf.uLastExecutedLineNumber == oSelf.u0ExceptionLineNumber else
+          "*%d/%d" % (oSelf.u0ExceptionLineNumber, oSelf.u0LastExecutedLineNumber),
         oSelf.sSourceFilePath,
         oSelf.uThreadId, oSelf.uThreadId, oSelf.sThreadName,
       );
   
   @classmethod
   @HideInCallStack
-  def __foFromPythonFramesAndExceptionLineNumbers(cClass, atxPythonFrames_and_uExceptionLineNumbers, oPythonThread = None):
+  def __foFromPythonFramesAndExceptionLineAndCharacterNumbers(cClass, atxPythonFramesAndExceptionLineAndCharacterNumbers, oPythonThread = None):
     oPythonThread = oPythonThread or threading.currentThread();
     return cClass([
-      cCallStack.cFrame.foFromPythonFrameThreadAndExceptionLineNumber(oPythonFrame, oPythonThread, uExceptionLineNumber)
-      for (oPythonFrame, uExceptionLineNumber) in atxPythonFrames_and_uExceptionLineNumbers
+      cCallStack.cFrame.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(oPythonFrame, oPythonThread, u0ExceptionLineNumber, None)
+      for (oPythonFrame, u0ExceptionLineNumber, u0ExceptionCharacterNumber) in atxPythonFramesAndExceptionLineAndCharacterNumbers
     ]);
   @classmethod
   @HideInCallStack
@@ -398,7 +406,7 @@ class cCallStack():
       if uEndIndex:
         print "uEndIndex: %d" % uEndIndex;
     uIndex = 0;
-    atxPythonFramesAndExceptionLineNumbers = [];
+    atxPythonFramesAndExceptionLineAndCharacterNumbers = [];
     for oPythonFrame in aoPythonFrames:
       if oPythonFrame.f_code in gaoHideFunctionsForPythonCodes:
         if gbDebugDumpRawStacksAndTracebacks:
@@ -414,12 +422,12 @@ class cCallStack():
         else:
           if gbDebugDumpRawStacksAndTracebacks:
             fDumpPythonFrame(oPythonFrame, "%2d+ " % uIndex);
-          atxPythonFramesAndExceptionLineNumbers.append((oPythonFrame, None));
+          atxPythonFramesAndExceptionLineAndCharacterNumbers.append((oPythonFrame, None, None));
         uIndex += 1;
         uCurrentEndIndex -= 1;
     if gbDebugDumpRawStacksAndTracebacks:
       print "-" * 80;
-    return cClass.__foFromPythonFramesAndExceptionLineNumbers(atxPythonFramesAndExceptionLineNumbers, oPythonThread);
+    return cClass.__foFromPythonFramesAndExceptionLineAndCharacterNumbers(atxPythonFramesAndExceptionLineAndCharacterNumbers, oPythonThread);
   
   @classmethod
   @HideInCallStack
@@ -442,9 +450,9 @@ class cCallStack():
   def foFromTraceback(cClass, oTraceback, oPythonThread = None):
     assert oTraceback, \
         "A traceback is required!";
-    atxPythonFrames_and_uExceptionLineNumbers = [];
     if gbDebugDumpRawStacksAndTracebacks:
       print "--[ cCallStack.foFromTraceback ]".ljust(80, "-");
+    atxPythonFramesAndExceptionLineAndCharacterNumbers = [];
     uIndex = 0;
     while oTraceback:
       oPythonFrame = oTraceback.tb_frame;
@@ -454,12 +462,12 @@ class cCallStack():
       else:
         if gbDebugDumpRawStacksAndTracebacks:
           fDumpPythonFrame(oPythonFrame, "%2d+ " % uIndex);
-        atxPythonFrames_and_uExceptionLineNumbers.append((oPythonFrame, oTraceback.tb_lineno));
+        atxPythonFramesAndExceptionLineAndCharacterNumbers.append((oPythonFrame, oTraceback.tb_lineno, None));
         uIndex += 1;
       oTraceback = oTraceback.tb_next;
     if gbDebugDumpRawStacksAndTracebacks:
       print "-" * 80;
-    oStack = cClass.__foFromPythonFramesAndExceptionLineNumbers(atxPythonFrames_and_uExceptionLineNumbers, oPythonThread);
+    oStack = cClass.__foFromPythonFramesAndExceptionLineAndCharacterNumbers(atxPythonFramesAndExceptionLineAndCharacterNumbers, oPythonThread);
     return oStack;
   
   @classmethod

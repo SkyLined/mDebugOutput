@@ -138,7 +138,7 @@ def ShowDebugOutput(fxFunction):
         oExceptionFrame = cCallStack.cFrame.foFromLastException();
         fDebugOutputHelper(
           oExceptionFrame.uThreadId, oExceptionFrame.sThreadName,
-          oExceptionFrame.sSourceFilePath, oExceptionFrame.uExceptionLineNumber, # or should it be sExceptionLineNumber ??
+          oExceptionFrame.sSourceFilePath, oExceptionFrame.u0ExceptionLineNumber,
           "raise %s // [%s] duration = %fs" % (fsToString(oException, guExceptionAsStringMaxSize), sCallDescription, time.time() - nStartTime),
           uIndentationChange = -1,
           bAlwaysShow = True,

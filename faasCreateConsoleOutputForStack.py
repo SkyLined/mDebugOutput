@@ -17,8 +17,8 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
   auExceptionReraisingFrameIndices = [-1];
   for oFrame in oStack.aoFrames:
     bIsExceptionFrame = oException and oFrame == oStack.aoFrames[-1] and not bIsSyntaxError;
-    bIsExceptionReraisingFrame = oFrame.uExceptionLineNumber is not None;
-    if bIsExceptionReraisingFrame and oFrame.uExceptionLineNumber != oFrame.uLastExecutedLineNumber:
+    bIsExceptionReraisingFrame = oFrame.u0ExceptionLineNumber is not None;
+    if bIsExceptionReraisingFrame and oFrame.u0ExceptionLineNumber != oFrame.uLastExecutedLineNumber:
       auExceptionReraisingFrameIndices.append(oFrame.uIndex);
     uCodeCallNameColor = guStackAtExceptionCallDescriptionColor if bIsExceptionFrame else guStackNormalCallDescriptionColor;
     uCodeCallNameAndLocationJoinerColor = guStackAtExceptionCallDescriptionAndLocationJoinerColor if bIsExceptionFrame else guStackNormalCallDescriptionAndLocationJoinerColor;
@@ -50,7 +50,7 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
           guStackTreeColor, " \xB3" * uCurrentFrameIndex, " \xC3\xC4\xBF ",
           guStackAtExceptionCallDescriptionColor, "<module>",
           guStackAtExceptionCallDescriptionAndLocationJoinerColor, " @ ",
-          guStackAtExceptionSourceFilePathColor, str(oException.filename), "/", str(oException.lineno),
+          guStackAtExceptionSourceFilePathColor, str(oException.filename), "/", str(oException.lineno), "/", str(oException.offset),
         ]
       ];
       uCurrentFrameIndex += 1;
