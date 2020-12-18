@@ -38,11 +38,11 @@ def fConsoleOutputExceptionDetails(oException, o0Traceback = None, o0PythonThrea
     dxExceptionDetails = fdxExceptionDetailsForWindowsError(oException);
   else:
     dxExceptionDetails = {};
-  aasConsoleOutputLines = dxExceptionDetails.get("aasConsoleOutputLines", None);
+  a0asConsoleOutputLines = dxExceptionDetails.get("aasConsoleOutputLines", None);
   dxHiddenProperties = dxExceptionDetails.get("dxHiddenProperties", {});
   bShowLocals = dxExceptionDetails.get("bShowLocals", True);
 
-  if not aasConsoleOutputLines:
+  if a0asConsoleOutputLines is None:
     aasConsoleOutputLines = [
       [guExceptionInformationColor, "Exception attributes:"],
     ] + [
@@ -55,6 +55,7 @@ def fConsoleOutputExceptionDetails(oException, o0Traceback = None, o0PythonThrea
       if sName[0] != "_"
     ];
   else:
+    aasConsoleOutputLines = a0asConsoleOutputLines;
     bAdditionalAttributes = False;
     for sName in sorted(dir(oException)):
       if sName[0] == "_":
