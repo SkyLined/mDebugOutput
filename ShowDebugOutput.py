@@ -112,7 +112,7 @@ def ShowDebugOutput(fxFunction):
       if sdxArgumentName:
         asCallArguments.append("**%s = %s" % (sdxArgumentName, fsToString(dxCallArgument, guArgumentAsStringMaxSize)));
       sCallArguments = ", ".join(asCallArguments);
-      oCallFrame = cCallStack.cFrame.foForThisFunction();
+      oCallFrame = cFrame.foForThisFunction();
       if gbShowInternalDebugOutput:
         if not bShowDebugOutput:
           print "@ HIDE %s(%s) @ %s" % (sCallDescription, sCallArguments, repr(sSourceFilePath));
@@ -135,7 +135,7 @@ def ShowDebugOutput(fxFunction):
       xReturnValue = fxFunction(*txCallArgumentValues, **dxCallArgumentValues);
     except Exception as oException:
       try:
-        oExceptionFrame = cCallStack.cFrame.foFromLastException();
+        oExceptionFrame = cFrame.foFromLastException();
         fDebugOutputHelper(
           oExceptionFrame.uThreadId, oExceptionFrame.sThreadName,
           oExceptionFrame.sSourceFilePath, oExceptionFrame.u0ExceptionLineNumber,
@@ -165,7 +165,7 @@ def ShowDebugOutput(fxFunction):
   ShowDebugOutput.oFunctionWrapperCode = fxFunctionWrapper.__code__;
   return fxFunctionWrapper;
 
-from .cCallStack import cCallStack;
+from .cFrame import cFrame;
 from .fbIsDebugOutputEnabledForSourceFilePathAndClass import fbIsDebugOutputEnabledForSourceFilePathAndClass;
 from .fDebugOutputHelper import fDebugOutputHelper;
 from .fsGetClassAndFunctionForClassAndCode import fsGetClassAndFunctionForClassAndCode;

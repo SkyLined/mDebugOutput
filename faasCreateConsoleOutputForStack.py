@@ -50,8 +50,10 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
           guStackTreeColor, " \xB3" * uCurrentFrameIndex, " \xC3\xC4\xBF ",
           guStackAtExceptionCallDescriptionColor, "<module>",
           guStackAtExceptionCallDescriptionAndLocationJoinerColor, " @ ",
-          guStackAtExceptionSourceFilePathColor, str(oException.filename), "/", str(oException.lineno), "/", str(oException.offset),
-        ]
+          guStackAtExceptionSourceFilePathColor, str(oException.filename), "/", str(oException.lineno),
+        ] + (
+          ["/", str(oException.offset)] if oException.offset is not None else []
+        )
       ];
       uCurrentFrameIndex += 1;
       aasConsoleOutputLines += faasCreateConsoleOutputForSourceCode(

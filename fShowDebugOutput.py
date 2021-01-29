@@ -1,12 +1,13 @@
 from .fDebugOutputHelper import fDebugOutputHelper;
 from .mGlobals import *;
-from .cCallStack import cCallStack;
+from .cFrame import cFrame;
 from .fTerminateWithException import fTerminateWithException;
 from .fbIsDebugOutputEnabledForSourceFilePathAndClass import fbIsDebugOutputEnabledForSourceFilePathAndClass;
 
 def fShowDebugOutput(sMessage):
   try:
-    oActiveFrame = cCallStack.cFrame.foForThisFunctionsCaller();
+    oActiveFrame = cFrame.foForThisFunctionsCaller();
+#    print "@@ %s" % (oActiveFrame.fsToString(),);
     if fbIsDebugOutputEnabledForSourceFilePathAndClass(oActiveFrame.sSourceFilePath, oActiveFrame.cClass):
       fDebugOutputHelper(
         oActiveFrame.uThreadId, oActiveFrame.sThreadName,

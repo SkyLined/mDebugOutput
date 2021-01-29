@@ -9,11 +9,11 @@ def ftxGetFunctionsMethodInstanceAndClassForPythonCode(oPythonCode, xFirstArgume
   sFunctionName = oPythonCode.co_name;
   if gbDebugCacheHelper: print "sFunctionName is %s" % sFunctionName;
   
-  if xFirstArgumentValueInCall:
+  if xFirstArgumentValueInCall is not None:
     if gbDebugCacheHelper: print "xFirstArgumentValueInCall = %s: %s" % \
         (repr(type(xFirstArgumentValueInCall)), repr(xFirstArgumentValueInCall));
     (oInstance, cClass) = ftocGetInstanceAndClassForUnknown(xFirstArgumentValueInCall);
-    if gbDebugCacheHelper: print "oInstance = %s" % (("object %s" % repr(oInstance)) if oInstance else "None");
+    if gbDebugCacheHelper: print "oInstance = %s" % (("object %s" % repr(oInstance)) if oInstance is not None else "None");
     if gbDebugCacheHelper: print "cClass = %s" % (("class %s" % repr(cClass)) if cClass else "None");
     fxClassOrStaticMethod = getattr(cClass, sFunctionName, None);
     if not isinstance(fxClassOrStaticMethod, types.MethodType):
@@ -39,7 +39,7 @@ def ftxGetFunctionsMethodInstanceAndClassForPythonCode(oPythonCode, xFirstArgume
         if gbDebugCacheHelper: print "Not an instance or class method: attribute %s in class is a function with different code %s" % \
             (sFunctionName, fxVisibleFunction.func_code.co_name);
       else:
-        fInstanceMethod = oInstance and getattr(oInstance, sFunctionName, None);
+        fInstanceMethod = oInstance is not None and getattr(oInstance, sFunctionName, None);
         if not isinstance(fInstanceMethod, types.MethodType):
           if gbDebugCacheHelper: print "Not an instance method: attribute %s in instance is not a method but %s" % \
               (sFunctionName, repr(fInstanceMethod));
