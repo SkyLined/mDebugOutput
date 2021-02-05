@@ -9,8 +9,12 @@ def fsToString(xData, uMaxLength = 1000):
       sData = "method %s.%s" % (xData.im_self.__name__, xData.__name__);
     else:
       sData = "method %s(#%X).%s" % (xData.im_class.__name__, id(xData.im_self), xData.__name__);
+    if hasattr(xData, "__func__") and hasattr(xData.__func__, "__code__"):
+      sData += " @ %s/%d" % (xData.__func__.__code__.co_filename, xData.__func__.__code__.co_firstlineno);
   elif isinstance(xData, types.FunctionType):
-    sData = "function %s" % xData.__name__;
+    sData = "function %s" % (xData.__name__,);
+    if hasattr(xData, "__code__"):
+      sData += " @ %s/%d" % (xData.__code__.co_filename, xData.__code__.co_firstlineno);
   elif isinstance(xData, set):
     sData = fsEnumerate("set(%s)", xData, lambda xValue: fsToString(xValue, uMaxLength));
   elif isinstance(xData, tuple):
