@@ -1,10 +1,12 @@
 {
+  "asProductTypes": ["Python module"],
+  "sPythonModuleName": "mDebugOutput",
   "asDependentOnProductNames": [
-    "oConsole", 
     "mWindowsSDK"
   ], 
   "asOptionalProductNames": [
-    "cFileSystemItem"
+    "cFileSystemItem",
+    "oConsole"
   ], 
   "oProductVersion": "2020-06-22 15:56", 
   "oRepository": {
