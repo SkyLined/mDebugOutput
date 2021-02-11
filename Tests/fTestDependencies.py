@@ -39,6 +39,8 @@ def fTestDependencies():
       sys.path = [sMainFolderPath, sParentFolderPath] + asOriginalSysPath;
       for sPythonApplicationName in dxProductDetails["asPythonApplicationNames"]:
         __import__(sPythonApplicationName, globals(), locals(), [], -1);
+    elif sProductType in ["JavaScript module", "PHP module"]:
+      pass;
     else:
       raise AssertionError("Unknown \"asProductTypes\" value %s!" % repr(sProductType));
   
