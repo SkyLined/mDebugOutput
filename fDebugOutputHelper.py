@@ -9,7 +9,7 @@ except:
       pass;
     @staticmethod
     def fOutput(*axMessage):
-      print "".join([ x for x in axMessage if isinstance(x, (str, unicode)) ]);
+      print "".join([ str(x) for x in axMessage if isinstance(x, (str, unicode)) ]);
     @staticmethod
     def fUnlock():
       pass;
