@@ -1,5 +1,19 @@
 import os, threading, time, traceback;
 
+try:
+  from oConsole import oConsole;
+except:
+  class oConsole(object):
+    @staticmethod
+    def fLock():
+      pass;
+    @staticmethod
+    def fOutput(*axMessage):
+      print "".join([ x for x in axMessage if isinstance(x, (str, unicode)) ]);
+    @staticmethod
+    def fUnlock():
+      pass;
+
 from .mGlobals import *;
 
 gnStartTime = time.clock();
@@ -12,8 +26,6 @@ assert len(aoPythonThreads) == 1, \
 guMainThreadId = aoPythonThreads[0].ident;
 
 def fDebugOutputHelper(uThreadId, sThreadName, sSourceFilePath, uLineNumber, xOutputLines, uIndentationChange = 0, bAlwaysShow = False, bLineNumberIsUncertain = False):
-  # Lazy load to prevent depency loops.
-  from oConsole import oConsole;
   global guThreadColor_by_uThreadId, gauThreadColors;
   asOutputLines = xOutputLines if isinstance(xOutputLines, list) else [xOutputLines];
   sThreadIdHeader = "".join([
@@ -87,7 +99,7 @@ def fDebugOutputHelper(uThreadId, sThreadName, sSourceFilePath, uLineNumber, xOu
       else:
         raise AssertionError("Stars are not alligned correctly.");
     for sActualOutputLine in asActualOutput:
-      oConsole.fPrint(uThreadColor, sActualOutputLine);
+      oConsole.fOutput(uThreadColor, sActualOutputLine);
   finally:
     oConsole.fUnlock();
   return True;
