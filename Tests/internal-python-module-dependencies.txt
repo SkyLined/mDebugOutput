@@ -13,13 +13,11 @@ io
 itertools
 keyword
 msvcrt
-mWindowsSDK
 opcode
 platform
 shutil
 string
 strop
-struct
 subprocess
 thread
 threading
