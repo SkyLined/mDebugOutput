@@ -3,8 +3,13 @@ import inspect, types;
 def fsToString(xData, uMaxLength = 1000):
   def fsEnumerate(sFormatString, axValues, fsProcessValue):
     return sFormatString % ", ".join([fsProcessValue(xValue) for xValue in axValues]);
-  sId = " #%X" % id(xData);
-  if isinstance(xData, types.MethodType):
+  sId = "(#%X)" % id(xData);
+  if xData is None:
+    sData = "None";
+    sId = ""; # Not relevant;
+  elif isinstance(xData, types.TypeType):
+    sData = repr(xData); # types
+  elif isinstance(xData, types.MethodType):
     if isinstance(xData.im_self, (types.ClassType, type)):
       sData = "method %s.%s" % (xData.im_self.__name__, xData.__name__);
     else:
@@ -36,10 +41,10 @@ def fsToString(xData, uMaxLength = 1000):
     try:
       sData = repr(xData);
     except:
-      sData = xData.__class__.__name__;
-      sId = "(#%X)" % id(xData);
+      sData = "<class %s>" % (repr(xData.__class__.__name__),);
     else:
-      sId = "";
+      if sData[:1] != "<":
+        sData = "<class %s: %s>" % (xData.__class__.__name__, repr(sData));
   elif (
     isinstance(xData, types.ClassType) # Old style classes
     or inspect.isclass(xData) # New style classes
