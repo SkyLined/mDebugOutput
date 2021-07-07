@@ -43,7 +43,7 @@ def fErrorFunction():
   assert 0, "";
 
 def fDumpObject(xObject):
-  print (",-- %s %s " % (type(xObject).__name__, repr(xObject))).ljust(80, "-");
+  print((",-- %s %s " % (type(xObject).__name__, repr(xObject))).ljust(80, "-"));
   for sName in dir(xObject):
     if sName not in [
       "__cmp__",
@@ -54,15 +54,15 @@ def fDumpObject(xObject):
       "__reduce__", "__reduce_ex__", "__repr__",
       "__setattr__", "__sizeof__", "__str__", "__subclasshook__"
     ]:
-      print "| %s = %s" % (sName, getattr(xObject, sName));
-  if isinstance(xObject, types.DictType):
-    print "|-- dict pairs ".ljust(80, "-");
+      print("| %s = %s" % (sName, getattr(xObject, sName)));
+  if isinstance(xObject, dict):
+    print("|-- dict pairs ".ljust(80, "-"));
     for (sName, xValue) in xObject.items():
-      print "| %s: %s" % (sName, repr(xValue));
-  print "|-- Referrers ".ljust(80, "-");
+      print("| %s: %s" % (sName, repr(xValue)));
+  print("|-- Referrers ".ljust(80, "-"));
   for xReferrer in gc.get_referrers(xObject):
-    print "| %s" % repr(xReferrer)[:200];
-  print ("'").ljust(80, "-");
+    print("| %s" % repr(xReferrer)[:200]);
+  print(("'").ljust(80, "-"));
 
 def fTestFunction(fErrorFunction):
   cOldStyleTest(fErrorFunction);

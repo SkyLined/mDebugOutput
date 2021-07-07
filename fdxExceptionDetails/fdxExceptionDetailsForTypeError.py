@@ -1,15 +1,24 @@
 import re, sys;
 
-def fdxExceptionDetailsForTypeError(oException, o0Traceback):
-  oBadKeywordArgumentErrorMessageMatch = re.match(r"^([_\w]+)\(\) got an unexpected keyword argument '([_\w]+)'$", oException.message);
-  oBadNumberOfArgumentsErrorMessageMatch = re.match(r"^([\_\w]+)\(\) takes (?:at least|at most|exactly) \d+ arguments? \((\d+) given\)$", oException.message);
-  if not oBadKeywordArgumentErrorMessageMatch and not oBadNumberOfArgumentsErrorMessageMatch:
+def fdxExceptionDetailsForTypeError(oException, oTraceback):
+  if len(oException.args) != 1:
     return {};
+  oBadKeywordArgumentErrorMessageMatch = re.match(r"^([_\w]+)\(\) got an unexpected keyword argument '([_\w]+)'$", oException.args[0]);
   if oBadKeywordArgumentErrorMessageMatch:
     sFunctionName, sArgumentName = oBadKeywordArgumentErrorMessageMatch.groups();
   else:
+    oBadNumberOfArgumentsErrorMessageMatch = re.match(r"^([\_\w]+)\(\) takes (?:at least|at most|exactly) \d+ arguments? \((\d+) given\)$", oException.args[0]);
+    if not oBadNumberOfArgumentsErrorMessageMatch:
+      return {
+        "aasConsoleOutputLines": [
+            [guExceptionInformationColor, oException.args[0]],
+        ],
+        "dxHiddenProperties": {
+          "args": oException.args,
+          "with_traceback": oException.with_traceback,
+        },
+      };
     sFunctionName, sNumberOfArgumentsGiven = oBadNumberOfArgumentsErrorMessageMatch.groups();
-  oTraceback = o0Traceback or sys.exc_info()[2];
   while oTraceback.tb_next:
     oTraceback = oTraceback.tb_next;
   oPythonFrame = oTraceback.tb_frame;
@@ -85,11 +94,11 @@ def fdxExceptionDetailsForTypeError(oException, o0Traceback):
   return {
     "aasConsoleOutputLines": aasConsoleOutputLines,
     "dxHiddenProperties": {
-      "message": oException.message,
-      "args": (oException.message,),
+      "args": oException.args,
+      "with_traceback": oException.with_traceback,
     },
   };
 
-from .ftxGetFunctionsMethodInstanceAndClassForPythonCode import ftxGetFunctionsMethodInstanceAndClassForPythonCode;
-from .ShowDebugOutput import ShowDebugOutput;
-from .mColors import *;
+from ..ftxGetFunctionsMethodInstanceAndClassForPythonCode import ftxGetFunctionsMethodInstanceAndClassForPythonCode;
+from ..ShowDebugOutput import ShowDebugOutput;
+from ..mColors import *;

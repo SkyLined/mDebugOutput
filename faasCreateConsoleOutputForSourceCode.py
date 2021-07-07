@@ -11,11 +11,11 @@ def faasCreateConsoleOutputForSourceCode(
 ):
   asModuleSourceCode = fasGetSourceCode(sSourceFilePath);
   aasConsoleOutputLines = [];
-  uStartLineNumber = max(uStartLineNumber, 0);
+  uStartLineNumber = max(uStartLineNumber, 1);
   uEndLineNumber = min(uEndLineNumber, len(asModuleSourceCode) + 1);
   if uStartLineNumber < uEndLineNumber:
     uLineNumberSize = len(str(uEndLineNumber))
-    for uLineNumber in xrange(uStartLineNumber, uEndLineNumber):
+    for uLineNumber in range(uStartLineNumber, uEndLineNumber):
       sSourceCodeLine = asModuleSourceCode[uLineNumber - 1];
       uColor = uInactiveCodeColor if uLineNumber + 1 < uEndLineNumber else uActiveCodeColor;
       aasConsoleOutputLines += [

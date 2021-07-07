@@ -1,9 +1,9 @@
-from .mColors import *;
+from ..mColors import *;
 
 def fdxExceptionDetailsForUnicodeDecodeError(oException):
   sInputString = oException.object;
   sOffensiveChars = sInputString[oException.start: oException.end];
-  bInputIsUnicode = isinstance(sInputString, unicode);
+  bInputIsUnicode = isinstance(sInputString, str);
   aasConsoleOutputLines = [
     [
       guExceptionInformationColor, "Cannot decode characters in string at offset ",
@@ -50,9 +50,9 @@ def fdxExceptionDetailsForUnicodeDecodeError(oException):
   
   dxHiddenProperties = {
     "args": (oException.encoding, oException.object, oException.start, oException.end, oException.reason),
+    "with_traceback": oException.with_traceback,
     "encoding": oException.encoding,
     "end": oException.end,
-    "message": "",
     "object": oException.object,
     "reason": oException.reason,
     "start": oException.start,

@@ -1,6 +1,6 @@
 import os;
 
-from fConsoleOutput import fConsoleOutput;
+from .fConsoleOutput import fConsoleOutput;
 
 def fTerminateWithConsoleOutput(sTitle, aasConsoleOutputLines):
   fConsoleOutput(sTitle, aasConsoleOutputLines);

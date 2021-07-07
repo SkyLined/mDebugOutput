@@ -1,22 +1,9 @@
 import os, threading, time, traceback;
 
-try:
-  from oConsole import oConsole;
-except:
-  class oConsole(object):
-    @staticmethod
-    def fLock():
-      pass;
-    @staticmethod
-    def fOutput(*axMessage):
-      print "".join([ str(x) for x in axMessage if isinstance(x, (str, unicode)) ]);
-    @staticmethod
-    def fUnlock():
-      pass;
-
+from .foConsoleLoader import foConsoleLoader;
 from .mGlobals import *;
 
-gnStartTime = time.clock();
+gnStartTime = time.time();
 guIndentation_by_uThreadId = {};
 guThreadColor_by_uThreadId = {};
 gauThreadColors = [0x0F07, 0x0F0C, 0x0F0E, 0x0F0A, 0x0F0B, 0x0F09, 0x0F0D];
@@ -25,37 +12,47 @@ assert len(aoPythonThreads) == 1, \
     "Expected only 1 thread!";
 guMainThreadId = aoPythonThreads[0].ident;
 
-def fDebugOutputHelper(uThreadId, sThreadName, sSourceFilePath, uLineNumber, xOutputLines, uIndentationChange = 0, bAlwaysShow = False, bLineNumberIsUncertain = False):
+def fDebugOutputHelper(uThreadId, sThreadName, sSourceFilePath, uLineNumber, xOutputLines, uIndentationChange = 0, bAlwaysShow = False, bIsReturnAddress = False):
   global guThreadColor_by_uThreadId, gauThreadColors;
+  oConsole = foConsoleLoader();
+  
   asOutputLines = xOutputLines if isinstance(xOutputLines, list) else [xOutputLines];
   sThreadIdHeader = "".join([
     "%4X" % uThreadId,
-    "\x07" if uThreadId == guMainThreadId else "\xFA",
+    "\u2022" if uThreadId == guMainThreadId else "\u00B7",
     sThreadName or "<unnamed>",
   ])[:64].ljust(64);
-  sTime = "%8.4f" % (time.clock() - gnStartTime);
+  sTime = "%8.4f" % (time.time() - gnStartTime);
   uIndex = 0;
   uIndentation = guIndentation_by_uThreadId.setdefault(uThreadId, 0);
   if uIndentationChange == 1:
     guIndentation_by_uThreadId[uThreadId] += 1;
-    sSingleIndentationHeader = sFirstIndentationHeader = (" \xB3" * (uIndentation - 1)) + (" \xC3" if uIndentation else "") + "\xC4\xBF";
+    sSingleIndentationHeader = sFirstIndentationHeader = (" \u2502" * (uIndentation - 1)) + (" \u251C" if uIndentation else "") + "\u2500\u2510";
     uIndentation += 1;
-    sMiddleIndentationHeader = sLastIndentationHeader = (" \xB3" * uIndentation);
+    sMiddleIndentationHeader = sLastIndentationHeader = (" \u2502" * uIndentation);
   elif uIndentationChange != -1:
     assert uIndentationChange == 0, \
         "Invalid uIndentationChange value %d" % uIndentationChange;
     sSingleIndentationHeader = sFirstIndentationHeader = \
-        sMiddleIndentationHeader = sLastIndentationHeader = " \xB3" * uIndentation;
+        sMiddleIndentationHeader = sLastIndentationHeader = " \u2502" * uIndentation;
   else:
     if guIndentation_by_uThreadId[uThreadId] == 1:
       del guIndentation_by_uThreadId[uThreadId];
     else:
       guIndentation_by_uThreadId[uThreadId] -= 1;
-    sFirstIndentationHeader = sMiddleIndentationHeader = " \xB3" * uIndentation;
+    sFirstIndentationHeader = sMiddleIndentationHeader = " \u2502" * uIndentation;
     uIndentation -= 1;
-    sSingleIndentationHeader = sLastIndentationHeader = (" \xB3" * (uIndentation - 1)) + (" \xC3" if uIndentation else "") + "\xC4\xD9";
-  sLineNumber = str(uLineNumber) + ("+" if bLineNumberIsUncertain else "");
-  sSourceCodeHeader = "%40s" % ("%s/%-5s" % (os.path.basename(sSourceFilePath), (sLineNumber)))[-40:];
+    sSingleIndentationHeader = sLastIndentationHeader = (" \u2502" * (uIndentation - 1)) + (" \u251C" if uIndentation else "") + "\u2500\u2518";
+  sSourceCodeHeader = (
+    "%33s/%-5s" % (
+      os.path.basename(sSourceFilePath),
+      str(uLineNumber) + (
+        "\u25C4" if bIsReturnAddress else
+        "\u25B2" if uIndentationChange < 0 else # must be an exception!
+        " "
+      ),
+    )
+  )[-39:];
   # Add headers to all output lines:
   asActualOutput = [];
   for sOutputLine in asOutputLines:
@@ -64,21 +61,21 @@ def fDebugOutputHelper(uThreadId, sThreadName, sSourceFilePath, uLineNumber, xOu
       sMessageHeader = "";
     elif uIndex == 0:
       sIndentationHeader = sFirstIndentationHeader;
-      sMessageHeader = "\xDA";
+      sMessageHeader = "\u250C";
     elif uIndex != len(asOutputLines) - 1:
       sIndentationHeader = sMiddleIndentationHeader;
-      sMessageHeader = "\xB3";
+      sMessageHeader = "\u2502";
       sTime = ": ".rjust(len(sTime));
-      sThreadIdHeader = " \xFA".ljust(len(sThreadId));
-      sSourceCodeHeader = "\xFA    ".rjust(len(sSourceCodeHeader));
+      sThreadIdHeader = " \u00B7".ljust(len(sThreadId));
+      sSourceCodeHeader = "\u00B7    ".rjust(len(sSourceCodeHeader));
     else:
       sIndentationHeader = sLastIndentationHeader;
-      sMessageHeader = "\xC0";
-      sTime = "\xFA\xFA ".rjust(len(sTime));
-      sThreadIdHeader = " \xFA\xFA".ljust(len(sThreadId));
-      sSourceCodeHeader = "\xFA\xFA\xFA    ".rjust(len(sSourceCodeHeader));
+      sMessageHeader = "\u2514";
+      sTime = "\u00B7\u00B7 ".rjust(len(sTime));
+      sThreadIdHeader = " \u00B7\u00B7".ljust(len(sThreadId));
+      sSourceCodeHeader = "\u00B7\u00B7\u00B7    ".rjust(len(sSourceCodeHeader));
     uIndex += 1;
-    asActualOutput.append("\xB3".join([
+    asActualOutput.append("\u2502".join([
       sTime,
       sThreadIdHeader[:64].ljust(64),
       sSourceCodeHeader,

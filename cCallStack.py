@@ -21,11 +21,11 @@ class cCallStack():
     ]);
   @classmethod
   @HideInCallStack
-  def foFromThisFunction(cClass):
+  def foForThisFunction(cClass):
     return cClass.foForCurrentThread();
   @classmethod
   @HideInCallStack
-  def foFromThisFunctionsCaller(cClass):
+  def foForThisFunctionsCaller(cClass):
     return cClass.foForCurrentThread(uEndIndex = 1);
   @classmethod
   @HideInCallStack
@@ -45,11 +45,11 @@ class cCallStack():
         uCurrentEndIndex += 1;
       oPythonFrame = oPythonFrame.f_back;
     if gbDebugDumpRawStacksAndTracebacks:
-      print "--[ cCallStack.foFromPythonFrameAndThread ]".ljust(80, "-");
+      print("--[ cCallStack.foFromPythonFrameAndThread ]".ljust(80, "-"));
       if uStartIndex:
-        print "uStartIndex: %d" % uStartIndex;
+        print("uStartIndex: %d" % uStartIndex);
       if uEndIndex:
-        print "uEndIndex: %d" % uEndIndex;
+        print("uEndIndex: %d" % uEndIndex);
     uIndex = 0;
     atxPythonFramesAndExceptionLineAndCharacterNumbers = [];
     for oPythonFrame in aoPythonFrames:
@@ -71,7 +71,7 @@ class cCallStack():
         uIndex += 1;
         uCurrentEndIndex -= 1;
     if gbDebugDumpRawStacksAndTracebacks:
-      print "-" * 80;
+      print("-" * 80);
     return cClass.__foFromPythonFramesAndExceptionLineAndCharacterNumbers(atxPythonFramesAndExceptionLineAndCharacterNumbers, oPythonThread);
   
   @classmethod
@@ -96,7 +96,7 @@ class cCallStack():
     assert oTraceback, \
         "A traceback is required!";
     if gbDebugDumpRawStacksAndTracebacks:
-      print "--[ cCallStack.foFromTraceback ]".ljust(80, "-");
+      print("--[ cCallStack.foFromTraceback ]".ljust(80, "-"));
     atxPythonFramesAndExceptionLineAndCharacterNumbers = [];
     uIndex = 0;
     while oTraceback:
@@ -111,20 +111,16 @@ class cCallStack():
         uIndex += 1;
       oTraceback = oTraceback.tb_next;
     if gbDebugDumpRawStacksAndTracebacks:
-      print "-" * 80;
+      print("-" * 80);
     oStack = cClass.__foFromPythonFramesAndExceptionLineAndCharacterNumbers(atxPythonFramesAndExceptionLineAndCharacterNumbers, oPythonThread);
     return oStack;
-  
-  @classmethod
-  def foFromLastException(cClass):
-    return cClass.foFromTraceback(sys.exc_info()[2]);
   
   def __init__(oSelf, aoFrames):
     assert len(aoFrames) > 0, \
         "A stack must have at least one frame!";
     oSelf.aoFrames = aoFrames; # frame 0 is the top frame.
     
-    for uIndex in xrange(len(oSelf.aoFrames)):
+    for uIndex in range(len(oSelf.aoFrames)):
       oFrame = oSelf.aoFrames[uIndex];
       oFrame.oStack = oSelf;
       oFrame.uIndex = uIndex;

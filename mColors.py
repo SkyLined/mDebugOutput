@@ -25,7 +25,7 @@ guStackAtExceptionCallDescriptionAndLocationJoinerColor = 0x0F07;
 guStackAtExceptionInactiveSourceCodeColor = 0x0F07;
 guStackAtExceptionActiveSourceCodeColor = 0x0F0C;
 guStackAtExceptionColumnIndicatorColor = 0x0F0E;
-guStackAtExceptionInformationColor = 0x0F0E;
+guStackExceptionInformationColor = 0x0F0E;
 
 guStackAfterExceptionCallDescriptorColor = 0x0F07;
 guStackAfterExceptionSourceFilePathColor = 0x0F07;

@@ -1,4 +1,4 @@
-from .mColors import *;
+from ..mColors import *;
 
 def fdxExceptionDetailsForSyntaxError(oException):
   return {
@@ -7,15 +7,18 @@ def fdxExceptionDetailsForSyntaxError(oException):
         guExceptionInformationColor, "Syntax error in ", guExceptionInformationHighlightColor, str(oException.filename),
         guExceptionInformationColor, " on line ", guExceptionInformationHighlightColor, str(oException.lineno),
         guExceptionInformationColor, ", column ", guExceptionInformationHighlightColor, str(oException.offset),
-        guExceptionInformationColor, ".",
+        guExceptionInformationColor, ":",
+      ],
+      [
+        guExceptionInformationColor, "\u25BA ", oException.msg,
       ],
     ],
     "dxHiddenProperties": {
-      "args": ('invalid syntax', (oException.filename, oException.lineno, oException.offset, oException.text)),
+      "args": (oException.msg, (oException.filename, oException.lineno, oException.offset, oException.text)),
+      "with_traceback": oException.with_traceback,
       "filename": oException.filename,
       "lineno": oException.lineno,
-      "message": '',
-      "msg": 'invalid syntax',
+      "msg": oException.msg,
       "offset": oException.offset,
       "print_file_and_line": None,
       "text": oException.text,

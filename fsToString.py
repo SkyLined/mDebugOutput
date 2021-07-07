@@ -1,19 +1,36 @@
 import inspect, types;
 
+gbmNotProvidedLoaded = False; # mNotProvided is loaded JIT to prevent import dependency issues.
+gz0NotProvided = None;
 def fsToString(xData, uMaxLength = 1000):
-  def fsEnumerate(sFormatString, axValues, fsProcessValue):
-    return sFormatString % ", ".join([fsProcessValue(xValue) for xValue in axValues]);
-  sId = "(#%X)" % id(xData);
+  global gbmNotProvidedLoaded, gz0NotProvided;
+  if not gbmNotProvidedLoaded:
+    gbmNotProvidedLoaded = True;
+    try: # mDebugOutput use is Optional
+      from mNotProvided import zNotProvided;
+    except ModuleNotFoundError as oException:
+      if oException.args[0] != "No module named 'mNotProvided'":
+        raise;
+    else:
+      gz0NotProvided = zNotProvided;
+  
+  fsEnumerate = lambda sFormatString, axValues, fsProcessValue: (
+    sFormatString % ", ".join([fsProcessValue(xValue) for xValue in axValues])
+  );
+  sId = "#%X" % id(xData);
   if xData is None:
     sData = "None";
     sId = ""; # Not relevant;
-  elif isinstance(xData, types.TypeType):
+  elif gz0NotProvided is not None and id(xData) == id(gz0NotProvided):
+    sData = "zNotProvided";
+    sId = ""; # Not relevant;
+  elif isinstance(xData, type):
     sData = repr(xData); # types
   elif isinstance(xData, types.MethodType):
-    if isinstance(xData.im_self, (types.ClassType, type)):
-      sData = "method %s.%s" % (xData.im_self.__name__, xData.__name__);
+    if isinstance(xData.__self__, type):
+      sData = "method %s.%s" % (xData.__self__.__name__, xData.__name__);
     else:
-      sData = "method %s(#%X).%s" % (xData.im_class.__name__, id(xData.im_self), xData.__name__);
+      sData = "method %s(#%X).%s" % (xData.__self__.__class__.__name__, id(xData.__self__), xData.__name__);
     if hasattr(xData, "__func__") and hasattr(xData.__func__, "__code__"):
       sData += " @ %s/%d" % (xData.__func__.__code__.co_filename, xData.__func__.__code__.co_firstlineno);
   elif isinstance(xData, types.FunctionType):
@@ -27,17 +44,14 @@ def fsToString(xData, uMaxLength = 1000):
   elif isinstance(xData, list):
     sData = fsEnumerate("[%s]", xData, lambda xValue: fsToString(xValue, uMaxLength));
   elif isinstance(xData, dict):
-    sData = fsEnumerate("{%s}", xData.items(), lambda txName_and_Value: "%s: %s" % (
+    sData = fsEnumerate("{%s}", list(xData.items()), lambda txName_and_Value: "%s: %s" % (
       fsToString(txName_and_Value[0], uMaxLength),
       fsToString(txName_and_Value[1], uMaxLength)
     ));
-  elif isinstance(xData, (str, int, unicode, long, float, bool)):
+  elif isinstance(xData, (str, int, float, bool)):
     sData = repr(xData)
     sId = ""; # Not relevant for these types.
-  elif (
-    isinstance(xData, types.InstanceType) # Old style objects
-    or inspect.isclass(getattr(xData, "__class__", None)) # New style objects
-  ):
+  elif inspect.isclass(getattr(xData, "__class__", None)):
     try:
       sData = repr(xData);
     except:
@@ -45,10 +59,7 @@ def fsToString(xData, uMaxLength = 1000):
     else:
       if sData[:1] != "<":
         sData = "<class %s: %s>" % (xData.__class__.__name__, repr(sData));
-  elif (
-    isinstance(xData, types.ClassType) # Old style classes
-    or inspect.isclass(xData) # New style classes
-  ):
+  elif inspect.isclass(xData):
     sData = xData.__name__;
   else:
     raise AssertionError("Unknown object type %s: %s" % (type(xData), repr(xData)));

@@ -3,8 +3,8 @@ import inspect, os, re, threading;
 from .HideInCallStack import HideInCallStack;
 
 @HideInCallStack
-def fTerminateWithException(oException, aasAdditionalConsoleOutputLines = None, bShowStacksForAllThread = False):
-  fConsoleOutputExceptionDetails(oException, aasAdditionalConsoleOutputLines = None, bShowStacksForAllThread = False)
+def fTerminateWithException(oException, a0asAdditionalConsoleOutputLines = None, bShowStacksForAllThread = False):
+  fConsoleOutputExceptionDetails(oException, a0asAdditionalConsoleOutputLines = None, bShowStacksForAllThread = False)
   os._exit(3);
 
 from .cCallStack import cCallStack;

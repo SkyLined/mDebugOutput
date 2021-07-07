@@ -1,4 +1,6 @@
-import functools, inspect, threading, time;
+import functools, inspect, sys, threading, time;
+
+from .gaoHideFunctionsForPythonCodes import gaoHideFunctionsForPythonCodes;
 
 gbShowInternalDebugOutput = False;
 guExceptionAsStringMaxSize = 400;
@@ -13,19 +15,18 @@ def ShowDebugOutput(fxFunction):
   }.get(type(fxFunction));
   if sBadDecorator:
     raise AssertionError("@ShowDebugOutput must not be followed by %s!" % sBadDecorator);
-  sSourceFilePath = fxFunction.func_code.co_filename;
-  uLineNumber = fxFunction.func_code.co_firstlineno;
+  sSourceFilePath = fxFunction.__code__.co_filename;
   (axArgumentNames, stxArgumentName, sdxArgumentName, txDefaultArgumentValues) = inspect.getargspec(fxFunction);
   sFirstArgumentName = axArgumentNames[0] if len(axArgumentNames) > 0 and isinstance(axArgumentNames[0], str) else None;
   dxDefaultArgumentValue_by_xName = {};
   if txDefaultArgumentValues:
-    for uArgumentIndex in xrange(-len(txDefaultArgumentValues), 0, 1):
+    for uArgumentIndex in range(-len(txDefaultArgumentValues), 0, 1):
       xArgumentName = axArgumentNames[uArgumentIndex];
       xDefaultArgumentValue = txDefaultArgumentValues[uArgumentIndex];
       dxDefaultArgumentValue_by_xName[xArgumentName] = xDefaultArgumentValue;
   if gbShowInternalDebugOutput:
-    print "@ WRAP %s(%s%s%s) @ %s" % (
-      fxFunction.func_name,
+    print("@ WRAP %s(%s%s%s) @ %s" % (
+      fxFunction.__name__,
       ", ".join([
         "%s%s" % (
           repr(xArgumentName),
@@ -38,8 +39,8 @@ def ShowDebugOutput(fxFunction):
       ", *%s" % stxArgumentName if stxArgumentName is not None else "",
       ", **%s" % sdxArgumentName if sdxArgumentName is not None else "",
       sSourceFilePath
-    );
-    print "  sFirstArgumentName: %s" % sFirstArgumentName;
+    ));
+    print("  sFirstArgumentName: %s" % sFirstArgumentName);
   
   @functools.wraps(fxFunction)
   @HideInCallStack
@@ -48,7 +49,7 @@ def ShowDebugOutput(fxFunction):
       oInstance = None;
       cClass = None;
       if gbShowInternalDebugOutput:
-        print "@ CALL %s(%s, %s)" % (fxFunction.func_name, repr(txCallArgumentValues)[1:-1], repr(dxCallArgumentValues)[1:-1]);
+        print("@ CALL %s(%s, %s)" % (fxFunction.__name__, repr(txCallArgumentValues)[1:-1], repr(dxCallArgumentValues)[1:-1]));
       if sFirstArgumentName is not None:
         if sFirstArgumentName in dxCallArgumentValues:
           xFirstArgumentValue = dxCallArgumentValues[sFirstArgumentName];
@@ -56,10 +57,10 @@ def ShowDebugOutput(fxFunction):
           xFirstArgumentValue = txCallArgumentValues[0];
         (oInstance, cClass) = ftocGetInstanceAndClassForUnknown(xFirstArgumentValue);
         if gbShowInternalDebugOutput:
-          print "xFirstArgument: %s" % repr(xFirstArgumentValue);
-          print "oInstance: %s" % oInstance;
-          print "cClass: %s" % cClass;
-      sCallDescription = fsGetClassAndFunctionForClassAndCode(cClass, fxFunction.func_code);
+          print("xFirstArgument: %s" % repr(xFirstArgumentValue));
+          print("oInstance: %s" % oInstance);
+          print("cClass: %s" % cClass);
+      sCallDescription = fsGetClassAndFunctionForClassAndCode(cClass, fxFunction.__code__);
       bShowDebugOutput = fbIsDebugOutputEnabledForSourceFilePathAndClass(sSourceFilePath, cClass);
       # The user may be trying to pass too many arguments or non-existing 
       # keyword arguments, which leads to TypeError exceptions in inspect.getcallargs. We'll
@@ -71,7 +72,7 @@ def ShowDebugOutput(fxFunction):
       dxCallArgument = {};
       uIndex = 0;
       # Process the unnamed call arguments first:
-      for uIndex in xrange(len(txCallArgumentValues)):
+      for uIndex in range(len(txCallArgumentValues)):
         xValue = txCallArgumentValues[uIndex];
         if uIndex < len(axArgumentNames):
           xName = axArgumentNames[uIndex];
@@ -86,7 +87,7 @@ def ShowDebugOutput(fxFunction):
           asUnnamedCallArguments.append("???#%d = %s" % (uIndex, fsToString(xValue, guArgumentAsStringMaxSize)));
       # Process the rest of the arguments to see which ones are provided by
       # name and which ones are missing:
-      axUnusedNamedCallArgumentNames = dxCallArgumentValues.keys();
+      axUnusedNamedCallArgumentNames = list(dxCallArgumentValues.keys());
       for xName in axUnusedArgumentNames[:]:
         if xName in dxCallArgumentValues:
           xValue = dxCallArgumentValues[xName];
@@ -115,9 +116,9 @@ def ShowDebugOutput(fxFunction):
       oCallFrame = cFrame.foForThisFunction();
       if gbShowInternalDebugOutput:
         if not bShowDebugOutput:
-          print "@ HIDE %s(%s) @ %s" % (sCallDescription, sCallArguments, repr(sSourceFilePath));
+          print("@ HIDE %s(%s) @ %s" % (sCallDescription, sCallArguments, repr(sSourceFilePath)));
         else:
-          print "@ SHOW %s(%s) @ %s" % (sCallDescription, sCallArguments, repr(sSourceFilePath));
+          print("@ SHOW %s(%s) @ %s" % (sCallDescription, sCallArguments, repr(sSourceFilePath)));
       if bShowDebugOutput:
         fDebugOutputHelper(
           oCallFrame.uThreadId, oCallFrame.sThreadName,
@@ -135,11 +136,55 @@ def ShowDebugOutput(fxFunction):
       xReturnValue = fxFunction(*txCallArgumentValues, **dxCallArgumentValues);
     except Exception as oException:
       try:
-        oExceptionFrame = cFrame.foFromLastException();
+        nDuration = time.time() - nStartTime;
+        # We detected this in the fxFunction call above (oTraceback) but it
+        # was raised in fxFunction, which would be in the previous traceback.
+        oTraceback = sys.exc_info()[2];
+        if oTraceback.tb_next:
+          oTraceback = oTraceback.tb_next;
+        oCurrentTraceback = oTraceback
+        # See if there are any calls to functions with ShowDebugOutput in
+        # previous tracebacks. If not, this exception was triggered in a
+        # function call that has not yet been shown. We need to show all functions
+        # that (re-)raised it before to explain where it comes from.
+        aoAdditionalTracebacksToShow = [];
+        while oTraceback.tb_next and oTraceback.tb_next.tb_frame.f_code != ShowDebugOutput.oFunctionWrapperCode:
+          oTraceback = oTraceback.tb_next;
+          aoAdditionalTracebacksToShow.append(oTraceback);
+        if oCurrentTraceback != oTraceback and not oTraceback.tb_next:
+          uIndentation = len(aoAdditionalTracebacksToShow);
+          for oTraceback in reversed(aoAdditionalTracebacksToShow):
+            oExceptionFrame = cFrame.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(
+              oPythonFrame = oTraceback.tb_frame,
+              oPythonThread = threading.currentThread(),
+              u0ExceptionLineNumber = oTraceback.tb_lineno,
+              u0ExceptionCharacterNumber = None,
+            );
+            fDebugOutputHelper(
+              oExceptionFrame.uThreadId, oExceptionFrame.sThreadName,
+              oExceptionFrame.sSourceFilePath, oExceptionFrame.u0ExceptionLineNumber,
+              "%s %sraise %s;" % (
+                " <" * uIndentation,
+                "" if oTraceback.tb_next is None else "re-",
+                fsToString(oException, guExceptionAsStringMaxSize),
+              ),
+            );
+            uIndentation -= 1;
+        oExceptionFrame = cFrame.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(
+          oPythonFrame = oCurrentTraceback.tb_frame,
+          oPythonThread = threading.currentThread(),
+          u0ExceptionLineNumber = oCurrentTraceback.tb_lineno,
+          u0ExceptionCharacterNumber = None,
+        );
         fDebugOutputHelper(
           oExceptionFrame.uThreadId, oExceptionFrame.sThreadName,
           oExceptionFrame.sSourceFilePath, oExceptionFrame.u0ExceptionLineNumber,
-          "raise %s // [%s] duration = %fs" % (fsToString(oException, guExceptionAsStringMaxSize), sCallDescription, time.time() - nStartTime),
+          "%sraise %s; // [%s] duration = %fs" % (
+            "" if oCurrentTraceback.tb_next is None else "re-",
+            fsToString(oException, guExceptionAsStringMaxSize),
+            sCallDescription,
+            nDuration
+          ),
           uIndentationChange = -1,
           bAlwaysShow = True,
         );
@@ -148,15 +193,17 @@ def ShowDebugOutput(fxFunction):
       raise;
     else:
       try:
-        sReturnValue = fsToString(xReturnValue, guReturnValueAsStringMaxSize) if xReturnValue is not None else None;
+        # Unfortunately, we do not know the line number where the function returned, so we cannot provide useful
+        # information on that. We will show the file name and line number of the call, so you at least know where
+        # it returned to. This will be indicated in the output (bIsReturnAddress = True).
+        sReturnValue = fsToString(xReturnValue, guReturnValueAsStringMaxSize);
         fDebugOutputHelper(
           oCallFrame.uThreadId, oCallFrame.sThreadName,
-          # The return is shown as taking place in the called function at unknown line number but after the first.
-          sSourceFilePath, uLineNumber,
-          "return%s // [%s] duration = %fs" % (" %s" % sReturnValue if sReturnValue else "", sCallDescription, time.time() - nStartTime),
+          oCallFrame.sSourceFilePath, oCallFrame.uLastExecutedLineNumber,
+          "return %s; // duration = %fs [%s] " % (sReturnValue, time.time() - nStartTime, sCallDescription),
           uIndentationChange = -1,
           bAlwaysShow = True,
-          bLineNumberIsUncertain = True,
+          bIsReturnAddress = True,
         );
       except Exception as oException:
         fTerminateWithException(oException);

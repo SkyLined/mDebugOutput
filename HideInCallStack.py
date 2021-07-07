@@ -8,5 +8,5 @@ def HideInCallStack(fxFunction):
   }.get(type(fxFunction));
   if sBadDecorator:
     raise AssertionError("@HideInCallStack must not be followed by %s!" % sBadDecorator);
-  gaoHideFunctionsForPythonCodes.add(fxFunction.func_code);
+  gaoHideFunctionsForPythonCodes.add(fxFunction.__code__);
   return fxFunction;

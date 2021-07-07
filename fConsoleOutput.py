@@ -1,26 +1,14 @@
 from .mColors import *;
-
-try:
-  from oConsole import oConsole;
-except:
-  class oConsole(object):
-    @staticmethod
-    def fLock():
-      pass;
-    @staticmethod
-    def fOutput(*axMessage, **dxIgnored):
-      print "".join([ str(x) for x in axMessage if isinstance(x, (str, unicode)) ]);
-    @staticmethod
-    def fUnlock():
-      pass;
+from .foConsoleLoader import foConsoleLoader;
 
 def fConsoleOutput(sTitle, aasConsoleOutputLines):
+  oConsole = foConsoleLoader();
   oConsole.fLock();
   try:
-    oConsole.fOutput(guBoxColor, "\xDA\xC4\xC4[ ", guBoxTitleColor, sTitle, guBoxColor, " ]", sPadding = "\xC4");
+    oConsole.fOutput(guBoxColor, "\u250C\u2500\u2500[ ", guBoxTitleColor, sTitle, guBoxColor, " ]", sPadding = "\u2500");
     for asConsoleOutputLine in aasConsoleOutputLines:
-      oConsole.fOutput(guBoxColor, "\xB3 ", *asConsoleOutputLine);
-    oConsole.fOutput(guBoxColor, "\xC0", sPadding = "\xC4");
+      oConsole.fOutput(guBoxColor, "\u2502 ", *asConsoleOutputLine);
+    oConsole.fOutput(guBoxColor, "\u2514", sPadding = "\u2500");
   finally:
     oConsole.fUnlock();
   

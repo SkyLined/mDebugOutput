@@ -14,7 +14,7 @@ def fsGetClassAndFunctionForClassAndCode(cClass, oCode):
     # Handle @ShowDebugOutput wrapped functions:
     fxWrappedFunction = getattr(xPotentialFunction, "fxWrappedFunction", None);
     if fxWrappedFunction:
-      return fxWrappedFunction.func_code;
+      return fxWrappedFunction.__code__;
     return getattr(xPotentialFunction, "func_code", None);
   
   def fszGetCallDescriptorForClassAndAttribute(cPotentialClass, xAttribute):
@@ -72,7 +72,7 @@ def fsGetClassAndFunctionForClassAndCode(cClass, oCode):
 if __name__ == "__main__":
   def fPrintCaller(cClass):
     oCode = inspect.currentframe().f_back.f_code;
-    print fsGetClassAndFunctionForClassAndCode(cClass, oCode);
+    print(fsGetClassAndFunctionForClassAndCode(cClass, oCode));
     
   class a(object):
     @staticmethod
@@ -132,21 +132,21 @@ if __name__ == "__main__":
       super(c, o).fMethod();
   
   o=c();
-  print "-" * 80;
+  print("-" * 80);
   o.fStaticA();
-  print "-" * 80;
+  print("-" * 80);
   o.fStaticB();
-  print "-" * 80;
+  print("-" * 80);
   o.fClassA();
-  print "-" * 80;
+  print("-" * 80);
   o.fClassB();
-  print "-" * 80;
+  print("-" * 80);
   o.fMethodA();
-  print "-" * 80;
+  print("-" * 80);
   o.fMethodB();
-  print "-" * 80;
+  print("-" * 80);
   o.fStatic();
-  print "-" * 80;
+  print("-" * 80);
   o.fClass();
-  print "-" * 80;
+  print("-" * 80);
   o.fMethod();

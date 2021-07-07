@@ -1,4 +1,4 @@
-from mGlobals import *;
+from .mGlobals import *;
 
 def fEnableDebugOutputForClass(cClass):
   gacClassesWithDebugOutputEnabled.add(cClass);

@@ -1,9 +1,11 @@
 import re;
 
-from .mColors import *;
+from ..mColors import *;
 
 def fdxExceptionDetailsForUnboundLocalError(oException):
-  oUninitializedVariableErrorMessageMatch = re.match(r"^local variable '([_\w]+)' referenced before assignment$", oException.message);
+  if len(oException.args) != 1:
+    return {};
+  oUninitializedVariableErrorMessageMatch = re.match(r"^local variable '([_\w]+)' referenced before assignment$", oException.args[0]);
   if not oUninitializedVariableErrorMessageMatch:
     return {};
   sVariableName = oUninitializedVariableErrorMessageMatch.group(1);
@@ -16,7 +18,7 @@ def fdxExceptionDetailsForUnboundLocalError(oException):
       ],
     ],
     "dxHiddenProperties": {
-      "message": oException.message,
-      "args": (oException.message,),
+      "args": oException.args,
+      "with_traceback": oException.with_traceback,
     },
   };

@@ -1,4 +1,4 @@
-from mGlobals import *;
+from .mGlobals import *;
 
 def fEnableAllDebugOutput():
   global gabAllDebugOutputEnabled;

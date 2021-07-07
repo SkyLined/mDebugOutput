@@ -1,28 +1,24 @@
 {
-  "asDependentOnProductNames": [
-    "mWindowsSDK"
-  ], 
-  "asJavaScriptModuleNames": [], 
-  "asOptionalProductNames": [
-    "cFileSystemItem", 
-    "oConsole"
-  ], 
-  "asPHPModuleNames": [], 
+  "a0sDebugAdditionalProductNames": [
+    "mFileSystemItem",
+    "mNotProvided",
+    "mWindowsSDK",
+    "mConsole"
+  ],
   "asProductTypes": [
     "Python module"
-  ], 
-  "asPythonApplicationNames": [], 
-  "oProductVersion": "2021-03-01 09:14", 
-  "oRepository": {
-    "sBranch": "master", 
-    "sRepositoryName": "mDebugOutput", 
-    "sType": "GitHub", 
-    "sUserName": "SkyLined"
-  }, 
-  "oTrialPeriodDuration": null, 
-  "sLicenseServerURL": null, 
-  "sProductAuthor": "SkyLined", 
-  "sProductName": "mDebugOutput", 
-  "sProductURL": "https://github.com/SkyLined/mDebugOutput", 
-  "sPythonModuleName": "mDebugOutput"
+  ],
+  "o0Repository": {
+    "sStructureVersion": "2021-07-02 11:16",
+    "sType": "GitHub",
+    "sbBranch": "master",
+    "sbRepositoryName": "mDebugOutput",
+    "sbUserName": "SkyLined"
+  },
+  "oProductVersion": "2021-07-07 12:50",
+  "s0PythonModuleName": "mDebugOutput",
+  "sProductAuthor": "SkyLined",
+  "sProductName": "mDebugOutput",
+  "sStructureVersion": "2021-07-02 11:16",
+  "sb0ProductURL": "https://github.com/SkyLined/mDebugOutput"
 }

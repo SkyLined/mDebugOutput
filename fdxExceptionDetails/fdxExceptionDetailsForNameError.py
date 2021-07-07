@@ -1,9 +1,11 @@
 import re;
 
-from .mColors import *;
+from ..mColors import *;
 
 def fdxExceptionDetailsForNameError(oException):
-  oUnknownVariableErrorMessageMatch = re.match(r"^(?:global )?name '([_\w]+)' is not defined$", oException.message);
+  if len(oException.args) < 1:
+    return {};
+  oUnknownVariableErrorMessageMatch = re.match(r"^(?:global )?name '([_\w]+)' is not defined$", oException.args[0]);
   if not oUnknownVariableErrorMessageMatch:
     return {};
   sVariableName = oUnknownVariableErrorMessageMatch.group(1);
@@ -16,7 +18,7 @@ def fdxExceptionDetailsForNameError(oException):
       ],
     ],
     "dxHiddenProperties": {
-      "message": oException.message,
-      "args": (oException.message,),
+      "args": oException.args,
+      "with_traceback": oException.with_traceback,
     },
   };
