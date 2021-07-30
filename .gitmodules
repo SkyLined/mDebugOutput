@@ -1,6 +1,6 @@
-[submodule "modules\\mWindowsSDK"]
-	path = modules\\mWindowsSDK
+[submodule "modules/mWindowsSDK"]
+	path = modules/mWindowsSDK
 	url = https://github.com/SkyLined/mWindowsSDK
-[submodule "modules\\oConsole"]
-	path = modules\\oConsole
+[submodule "modules/oConsole"]
+	path = modules/oConsole
 	url = https://github.com/SkyLined/oConsole
