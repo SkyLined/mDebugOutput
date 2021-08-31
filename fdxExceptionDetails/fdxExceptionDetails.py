@@ -8,6 +8,7 @@ from .fdxExceptionDetailsForAttributeError import fdxExceptionDetailsForAttribut
 from .fdxExceptionDetailsForImportError import fdxExceptionDetailsForImportError;
 if m0json:
   from .fdxExceptionDetailsForJSONDecodeError import fdxExceptionDetailsForJSONDecodeError;
+from .fdxExceptionDetailsForKeyError import fdxExceptionDetailsForKeyError;
 from .fdxExceptionDetailsForNameError import fdxExceptionDetailsForNameError;
 from .fdxExceptionDetailsForSyntaxError import fdxExceptionDetailsForSyntaxError;
 from .fdxExceptionDetailsForTypeError import fdxExceptionDetailsForTypeError;
@@ -25,6 +26,8 @@ def fdxExceptionDetails(oException, oTraceback):
     return fdxExceptionDetailsForImportError(oException);
   elif m0json and isinstance(oException, m0json.decoder.JSONDecodeError):
     return fdxExceptionDetailsForJSONDecodeError(oException);
+  elif isinstance(oException, KeyError):
+    return fdxExceptionDetailsForKeyError(oException);
   elif isinstance(oException, NameError):
     return fdxExceptionDetailsForNameError(oException);
   elif isinstance(oException, SyntaxError):
