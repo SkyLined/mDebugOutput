@@ -1,5 +1,5 @@
-from .fasGetSourceCode import fasGetSourceCode;
-from .mColors import *;
+from .mColorsAndChars import *;
+# The rest of the imports are done at the bottom to prevent import loops.
 
 def faasCreateConsoleOutputForSourceCode(
   sSourceFilePath,
@@ -25,3 +25,5 @@ def faasCreateConsoleOutputForSourceCode(
         ]
       ];
   return aasConsoleOutputLines;
+
+from .fasGetSourceCode import fasGetSourceCode;

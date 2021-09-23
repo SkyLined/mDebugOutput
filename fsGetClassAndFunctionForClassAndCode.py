@@ -70,65 +70,65 @@ def fsGetClassAndFunctionForClassAndCode(cClass, oCode):
   return "%s?.%s" % (cClass.__name__, sFunctionName);
 
 if __name__ == "__main__":
-  def fPrintCaller(cClass):
+  def fOutputCaller(cClass):
     oCode = inspect.currentframe().f_back.f_code;
     print(fsGetClassAndFunctionForClassAndCode(cClass, oCode));
     
   class a(object):
     @staticmethod
     def fStaticA():
-      fPrintCaller(a);
+      fOutputCaller(a);
     @classmethod
     def fClassA(cClass):
-      fPrintCaller(cClass);
+      fOutputCaller(cClass);
     def fMethodA(o):
-      fPrintCaller(o.__class__);
+      fOutputCaller(o.__class__);
     
     @staticmethod
     def fStatic():
-      fPrintCaller(a);
+      fOutputCaller(a);
     @classmethod
     def fClass(cClass):
-      fPrintCaller(cClass);
+      fOutputCaller(cClass);
     def fMethod(o):
-      fPrintCaller(o.__class__);
+      fOutputCaller(o.__class__);
     
   class b(a):
     @staticmethod
     def fStaticB():
-      fPrintCaller(b);
+      fOutputCaller(b);
       a.fStaticA();
     @classmethod
     def fClassB(cClass):
-      fPrintCaller(cClass);
+      fOutputCaller(cClass);
       cClass.fClassA();
     def fMethodB(o):
-      fPrintCaller(o.__class__);
+      fOutputCaller(o.__class__);
       o.fMethodA();
     
     @staticmethod
     def fStatic():
-      fPrintCaller(b);
+      fOutputCaller(b);
       super(b, b).fStatic();
     @classmethod
     def fClass(cClass):
-      fPrintCaller(cClass);
+      fOutputCaller(cClass);
       super(b, cClass).fClass();
     def fMethod(o):
-      fPrintCaller(o.__class__);
+      fOutputCaller(o.__class__);
       super(b, o).fMethod();
   
   class c(b):
     @staticmethod
     def fStatic():
-      fPrintCaller(c);
+      fOutputCaller(c);
       super(c, c).fStatic();
     @classmethod
     def fClass(cClass):
-      fPrintCaller(cClass);
+      fOutputCaller(cClass);
       super(c, cClass).fClass();
     def fMethod(o):
-      fPrintCaller(o.__class__);
+      fOutputCaller(o.__class__);
       super(c, o).fMethod();
   
   o=c();

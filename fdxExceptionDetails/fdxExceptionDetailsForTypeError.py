@@ -101,4 +101,5 @@ def fdxExceptionDetailsForTypeError(oException, oTraceback):
 
 from ..ftxGetFunctionsMethodInstanceAndClassForPythonCode import ftxGetFunctionsMethodInstanceAndClassForPythonCode;
 from ..ShowDebugOutput import ShowDebugOutput;
-from ..mColors import *;
+from ..mColorsAndChars import *;
+

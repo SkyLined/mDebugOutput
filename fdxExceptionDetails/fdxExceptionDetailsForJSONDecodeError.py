@@ -1,4 +1,4 @@
-import re, sys;
+﻿import re, sys;
 
 guMaxNumberOfLinesToShow = 5;
 
@@ -44,7 +44,7 @@ def fdxExceptionDetailsForJSONDecodeError(oException):
   aasConsoleOutputLines.append(
     [
       guExceptionInformationColor, " " * uMaxIndexLength, "  ", " " * uErrorColumnIndex,
-      guExceptionInformationHighlightColor, "\u25B2 ", repr(oException),
+      guExceptionInformationHighlightColor, "▲ ", str(oException.msg),
     ]
   );
   return {
@@ -61,4 +61,4 @@ def fdxExceptionDetailsForJSONDecodeError(oException):
   };
 
 from ..ShowDebugOutput import ShowDebugOutput;
-from ..mColors import *;
+from ..mColorsAndChars import *;

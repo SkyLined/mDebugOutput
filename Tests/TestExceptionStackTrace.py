@@ -3,6 +3,8 @@ sys.path.append("..");
 from mDebugOutput.cCallStack import cCallStack;
 from mDebugOutput.fTerminateWithException import fTerminateWithException;
 
+guExitCodeInternalError = 1; # Use standard value;
+
 class cOldStyleTest():
   def __init__(oSelf, fErrorFunction):
     try:
@@ -70,4 +72,4 @@ def fTestFunction(fErrorFunction):
 try:
   fTestFunction(fErrorFunction);
 except Exception as oException:
-  fTerminateWithException(oException);
+  fTerminateWithException(oException, guExitCodeInternalError);

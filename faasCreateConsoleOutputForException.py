@@ -78,5 +78,5 @@ def faasCreateConsoleOutputForException(oException, oTraceback, oStack):
   
 from .fdxExceptionDetails import fdxExceptionDetails;
 from .fsToString import fsToString;
-from .mColors import *;
+from .mColorsAndChars import *;
 

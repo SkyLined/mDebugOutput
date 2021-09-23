@@ -1,5 +1,3 @@
-from ..mColors import *;
-
 try:
   from mWindowsSDK import *;
 except ModuleNotFoundError as oException:
@@ -45,4 +43,6 @@ def fdxExceptionDetailsForWindowsError(oException):
       "winerror": oException.winerror,
     },
   };
+
+from ..mColorsAndChars import *;
 

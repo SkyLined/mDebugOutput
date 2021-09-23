@@ -1,7 +1,5 @@
 import re;
 
-from ..mColors import *;
-
 def fdxExceptionDetailsForAttributeError(oException):
   if len(oException.args) != 1:
     return {};
@@ -29,3 +27,6 @@ def fdxExceptionDetailsForAttributeError(oException):
       "with_traceback": oException.with_traceback,
     },
   };
+
+from ..mColorsAndChars import *;
+

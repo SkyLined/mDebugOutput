@@ -1,7 +1,4 @@
-import inspect;
-from .faasCreateConsoleOutputForSourceCode import faasCreateConsoleOutputForSourceCode;
-from .fasGetSourceCode import fasGetSourceCode;
-from .mColors import *;
+﻿import inspect;
 
 def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True):
   aasConsoleOutputLines = [];
@@ -27,7 +24,7 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
     # Function, source file name and line number
     aasConsoleOutputLines += [
       [
-        guStackTreeColor, " \u250A" * (oFrame.uIndex - 1), " \u251C" if oFrame.uIndex > 0 else "", "\u2500\u2510 ",
+        guStackTreeColor, " ╷" * (oFrame.uIndex - 1), " ├" if oFrame.uIndex > 0 else "", "─┐ ",
         uCodeCallNameColor, oFrame.sCallDescription,
         uCodeCallNameAndLocationJoinerColor, " @ ",
         uCodeCallLocationColor, oFrame.sExceptionCodeLocation if bIsExceptionReraisingFrame else oFrame.sLastExecutedCodeLocation,
@@ -39,7 +36,7 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
       oFrame.faasCreateConsoleOutputForLastExecutedSourceCode
     );
     aasConsoleOutputLines += faasCreateConsoleOutputForFrameSourceCode(
-      axOutputHeader = [guStackTreeColor, " \u250A" * oFrame.uIndex, " \u2502 "],
+      axOutputHeader = [guStackTreeColor, " ╷" * oFrame.uIndex, " │ "],
       uLineNumberColor = guLineNumberColor,
       uInactiveCodeColor = guStackAtExceptionInactiveSourceCodeColor if bIsExceptionFrame else guStackNormalInactiveSourceCodeColor,
       uActiveCodeColor = guStackAtExceptionActiveSourceCodeColor if bIsExceptionFrame else guStackNormalActiveSourceCodeColor,
@@ -52,7 +49,7 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
       uCurrentFrameIndex += 1;
       aasConsoleOutputLines += [
         [
-          guStackTreeColor, " \u250A" * (uCurrentFrameIndex - 1), " \u251C" if uCurrentFrameIndex > 0 else "", "\u2500\u2510 ",
+          guStackTreeColor, " ╷" * (uCurrentFrameIndex - 1), " ├" if uCurrentFrameIndex > 0 else "", "─┐ ",
           guStackAtExceptionCallDescriptionColor, "<module>",
           guStackAtExceptionCallDescriptionAndLocationJoinerColor, " @ ",
           guStackAtExceptionSourceFilePathColor, str(oException.filename), "/", str(oException.lineno),
@@ -65,7 +62,7 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
         sSourceFilePath = oException.filename,
         uStartLineNumber = oException.lineno - 1,
         uEndLineNumber = oException.lineno + 1,
-        axOutputHeader = [guStackTreeColor, " \u250A" * uCurrentFrameIndex, " \u2502 "],
+        axOutputHeader = [guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ "],
         uLineNumberColor = guLineNumberColor,
         uInactiveCodeColor = guStackAtExceptionInactiveSourceCodeColor,
         uActiveCodeColor = guStackAtExceptionActiveSourceCodeColor,
@@ -75,8 +72,8 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
       if oException.offset is not None:
         aasConsoleOutputLines += [
           [
-            guStackTreeColor, " \u250A" * uCurrentFrameIndex, " \u2502 ",
-            guStackAtExceptionColumnIndicatorColor, "\u256D", "\u2504" * (uEndLineNumberSize + oException.offset - 1), "\u256F"
+            guStackTreeColor, " ╷" * uCurrentFrameIndex, " │", 
+            guStackAtExceptionColumnIndicatorColor, " ╒", "═" * (uEndLineNumberSize + oException.offset), "╛"
           ]
         ];
         sException = "%s(%s at character %d)" % (oException.__class__.__name__, repr(oException.msg), oException.offset);
@@ -91,17 +88,17 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
     # Exception
     aasConsoleOutputLines += [
       [
-        guStackTreeColor, " \u250A" * uNextFrameIndex, 
+        guStackTreeColor, " ╷" * uNextFrameIndex, 
       ] + (
         [
-          " \u256D", "\u2500" * 2 * (uCurrentFrameIndex - uNextFrameIndex - 1), "\u2500\u256f",
+          " ╒", "═" * (2 * (uCurrentFrameIndex - uNextFrameIndex) - 1), "╛",
         ] if uCurrentFrameIndex != uNextFrameIndex else [
-          " \u2502",
+          " │",
         ] if uCurrentFrameIndex != 0 else [
-          " \u2580",
+          " ▀",
         ]
       ) + [
-        guStackExceptionInformationColor, " \u25A0 ", sException,
+        guStackExceptionInformationColor, " ■ ", sException,
       ]
     ];
   while auExceptionReraisingFrameIndices:
@@ -112,7 +109,7 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
     # Source file name and line number where the exception was handled
     aasConsoleOutputLines += [
       [
-        guStackTreeColor, " \u250A" * oFrame.uIndex, " \u2502 ",
+        guStackTreeColor, " ╷" * oFrame.uIndex, " │ ",
         guStackAfterExceptionCallDescriptorColor, oFrame.sCallDescription,
         guStackAfterExceptionCallDescriptorAndSourceFilePathJoinerColor, " @ ",
         guStackAfterExceptionSourceFilePathColor, oFrame.sLastExecutedCodeLocation,
@@ -120,23 +117,25 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
     ];
     # Source code where the exception was handled
     aasConsoleOutputLines += oFrame.faasCreateConsoleOutputForLastExecutedSourceCode(
-      axOutputHeader = [guStackTreeColor, " \u250A" * oFrame.uIndex, " \u2502 "],
+      axOutputHeader = [guStackTreeColor, " ╷" * oFrame.uIndex, " │ "],
       uLineNumberColor = guLineNumberColor,
       uInactiveCodeColor = guStackAfterExceptionInactiveSourceCodeColor,
       uActiveCodeColor = guStackAfterExceptionActiveSourceCodeColor,
     );
     aasConsoleOutputLines += [
       [
-        guStackTreeColor, " \u250A" * uNextFrameIndex, " \u256D" if uNextFrameIndex >= 0 else "", \
-      ] + (
-        [
-          "\u2500" * 2 * (uCurrentFrameIndex - uNextFrameIndex - 1), "\u2500",
-        ] if uCurrentFrameIndex != 0 else [
-          "\u25A0",
-        ]
-      ) + [
-        "\u256f",
-      ]
+        guStackTreeColor, " ╷" * uNextFrameIndex, " ╒" if uNextFrameIndex >= 0 else "", \
+      ] + ([
+        "═" * 2 * (uCurrentFrameIndex - uNextFrameIndex - 1)
+      ] if uCurrentFrameIndex != 0 else []) + [
+        "═╛",
+      ] + ([
+        guStackTerminatedInformationColor, " ■ Application terminated because exception was not handled.",
+      ] if uCurrentFrameIndex == 0 else [])
     ];
   
   return aasConsoleOutputLines;
+
+from .faasCreateConsoleOutputForSourceCode import faasCreateConsoleOutputForSourceCode;
+from .fasGetSourceCode import fasGetSourceCode;
+from .mColorsAndChars import *;

@@ -6,6 +6,7 @@ gbShowInternalDebugOutput = False;
 guExceptionAsStringMaxSize = 400;
 guArgumentAsStringMaxSize = 200;
 guReturnValueAsStringMaxSize = 400;
+guExitCodeInternalError = 1; # This is the common default I use. There's currently no good way to set this per application.
 
 def ShowDebugOutput(fxFunction):
   sBadDecorator = {
@@ -128,7 +129,7 @@ def ShowDebugOutput(fxFunction):
         );
       oPythonThread = threading.currentThread();
     except Exception as oException:
-      fTerminateWithException(oException);
+      fTerminateWithException(oException, guExitCodeInternalError);
     if not bShowDebugOutput:
       return fxFunction(*txCallArgumentValues, **dxCallArgumentValues);
     nStartTime = time.time();
@@ -189,7 +190,7 @@ def ShowDebugOutput(fxFunction):
           bAlwaysShow = True,
         );
       except Exception as oException:
-        fTerminateWithException(oException);
+        fTerminateWithException(oException, guExitCodeInternalError);
       raise;
     else:
       try:
@@ -206,7 +207,7 @@ def ShowDebugOutput(fxFunction):
           bIsReturnAddress = True,
         );
       except Exception as oException:
-        fTerminateWithException(oException);
+        fTerminateWithException(oException, guExitCodeInternalError);
       return xReturnValue;
   fxFunctionWrapper.fxWrappedFunction = fxFunction;
   ShowDebugOutput.oFunctionWrapperCode = fxFunctionWrapper.__code__;

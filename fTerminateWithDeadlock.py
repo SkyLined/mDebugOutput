@@ -4,10 +4,9 @@ from .cCallStack import cCallStack;
 from .faasCreateConsoleOutputForStack import faasCreateConsoleOutputForStack;
 from .fsToString import fsToString;
 from .fTerminateWithConsoleOutput import fTerminateWithConsoleOutput;
-from .mColors import *;
+from .mColorsAndChars import *;
 
-
-def fTerminateWithDeadlock(sMessage = None, aasConsoleOutputLines = None, uDeadlockedWithThreadId = None):
+def fTerminateWithDeadlock(sMessage = None, aasConsoleOutputLines = None, uDeadlockedWithThreadId = None, uExitCode = 3):
   oPythonThread = threading.currentThread();
   sTitle = "Deadlock reported";
   doStack_by_uThreadId = dict([
@@ -63,4 +62,4 @@ def fTerminateWithDeadlock(sMessage = None, aasConsoleOutputLines = None, uDeadl
     ] + faasCreateConsoleOutputForStack(doStack_by_uThreadId[oPythonThread.ident]) + [
       [],
     ] + faasCreateConsoleOutputForStack(doStack_by_uThreadId[uDeadlockedWithThreadId]);
-  fTerminateWithConsoleOutput(sTitle, aasConsoleOutputLines)
+  fTerminateWithConsoleOutput(sTitle, aasConsoleOutputLines, uExitCode = uExitCode)

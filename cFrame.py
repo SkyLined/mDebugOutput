@@ -1,14 +1,8 @@
 import inspect, os, sys, threading;
 
-from .fasGetSourceCode import fasGetSourceCode;
-from .faasCreateConsoleOutputForSourceCode import faasCreateConsoleOutputForSourceCode;
-from .fDumpPythonFrame import fDumpPythonFrame;
-from .fDumpTraceback import fDumpTraceback;
-from .fsGetClassAndFunctionForClassAndCode import fsGetClassAndFunctionForClassAndCode;
-from .ftxGetFunctionsMethodInstanceAndClassForPythonCode import ftxGetFunctionsMethodInstanceAndClassForPythonCode;
-from .gaoHideFunctionsForPythonCodes import gaoHideFunctionsForPythonCodes;
 from .HideInCallStack import HideInCallStack;
-from .mColors import *;
+from .mColorsAndChars import *;
+# The rest of the imports are done at the bottom to prevent import loops.
 
 goPythonCode_by_mModule = {};
 gfxFunction_by_oPythonCode = {};
@@ -282,7 +276,7 @@ class cFrame():
     uEndIndex = oSelf.uLineNumber + uEndOffset - 1;
     if uStartIndex >= uEndIndex: return [];
     return oSelf.asModuleSourceCode[uStartIndex: uEndIndex];
-
+  
   def fasGetExceptionSourceLines(oSelf, uStartOffset = 0, uEndOffset = 1):
     assert oSelf.u0ExceptionLineNumber is not None, \
         "This frame does not appear to be for an exception, as there is no exception line number specified!";
@@ -290,7 +284,7 @@ class cFrame():
     uEndIndex = max(0, oSelf.u0ExceptionLineNumber + uEndOffset - 1);
     if uStartIndex >= uEndIndex: return [];
     return oSelf.asModuleSourceCode[uStartIndex: uEndIndex];
-
+  
   def fasGetLastExecutedSourceLines(oSelf, uStartOffset = 0, uEndOffset = 1):
     uStartIndex = max(0, oSelf.uLastExecutedLineNumber - 1 + uStartOffset);
     uEndIndex = max(0, oSelf.uLastExecutedLineNumber + uEndOffset - 1);
@@ -311,3 +305,12 @@ class cFrame():
       oSelf.sSourceFilePath,
       oSelf.uThreadId, oSelf.uThreadId, oSelf.sThreadName,
     );
+
+from .fasGetSourceCode import fasGetSourceCode;
+from .faasCreateConsoleOutputForSourceCode import faasCreateConsoleOutputForSourceCode;
+from .fDumpPythonFrame import fDumpPythonFrame;
+from .fDumpTraceback import fDumpTraceback;
+from .fsGetClassAndFunctionForClassAndCode import fsGetClassAndFunctionForClassAndCode;
+from .ftxGetFunctionsMethodInstanceAndClassForPythonCode import ftxGetFunctionsMethodInstanceAndClassForPythonCode;
+from .gaoHideFunctionsForPythonCodes import gaoHideFunctionsForPythonCodes;
+

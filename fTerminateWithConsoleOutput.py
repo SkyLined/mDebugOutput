@@ -1,8 +1,8 @@
-import os;
+import sys;
 
 from .fConsoleOutput import fConsoleOutput;
 
-def fTerminateWithConsoleOutput(sTitle, aasConsoleOutputLines):
+def fTerminateWithConsoleOutput(sTitle, aasConsoleOutputLines, uExitCode = 3):
   fConsoleOutput(sTitle, aasConsoleOutputLines);
-  os._exit(3);
+  sys.exit(uExitCode);
 

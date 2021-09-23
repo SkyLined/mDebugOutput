@@ -1,4 +1,4 @@
-import inspect;
+﻿import inspect;
 from .faasOutputSourceCode import faasOutputSourceCode;
 from .fasGetSourceCode import fasGetSourceCode;
 from .mColors import *;
@@ -25,7 +25,10 @@ def faasOutputStack(oStack, oException = None, bAddHeader = True):
     uCodeCallLocationColor = guStackAtExceptionSourceFilePathColor if bIsLastFrame else guStackBeforeExceptionSourceFilePathColor;
     aasOutputLines += [
       [
-        guStackTreeColor, " \u2502" * (oFrame.uIndex - 1), " \u251C" if oFrame.uIndex > 0 else "", "\u2500\u2510 ",
+        guStackTreeColor,
+          " │" * (oFrame.uIndex - 1),
+          " ├" if oFrame.uIndex > 0 else "─",
+          "─┐ ",
         uCodeCallNameColor, oFrame.sCallDescription,
         uCodeCallNameAndLocationJoinerColor, " @ ",
         uCodeCallLocationColor, oFrame.sExceptionCodeLocation if bIsExceptionFrame else oFrame.sLastExecutedCodeLocation,
@@ -33,7 +36,7 @@ def faasOutputStack(oStack, oException = None, bAddHeader = True):
     ];
     uLineNumber = oFrame.uExceptionLineNumber if bIsExceptionFrame else oFrame.uLastExecutedLineNumber;
     aasOutputLines += faasOutputSourceCode(
-      axOutputHeader = [guStackTreeColor, " \u2502" * (oFrame.uIndex + 1), " "],
+      axOutputHeader = [guStackTreeColor, " │" * (oFrame.uIndex + 1), " "],
       asModuleSourceCode = oFrame.asModuleSourceCode,
       uStartLineNumber = uLineNumber - 1,
       uEndLineNumber = uLineNumber + 1,
@@ -47,7 +50,9 @@ def faasOutputStack(oStack, oException = None, bAddHeader = True):
     if bIsSyntaxError:
       aasOutputLines += [
         [
-          guStackTreeColor, " \u2502" * uCurrentFrameIndex, " \u251C\u2500\u2510 ",
+          guStackTreeColor,
+            " │" * uCurrentFrameIndex,
+            " ├─┐ ",
           guStackAtExceptionCallDescriptionColor, "<module>",
           guStackAtExceptionCallDescriptionAndLocationJoinerColor, " @ ",
           guStackAtExceptionSourceFilePathColor, str(oException.filename), "/", str(oException.lineno),
@@ -56,7 +61,7 @@ def faasOutputStack(oStack, oException = None, bAddHeader = True):
       asModuleSourceCode = fasGetSourceCode(oException.filename);
       uCurrentFrameIndex += 1;
       aasOutputLines += faasOutputSourceCode(
-        axOutputHeader = [guStackTreeColor, " \u2502" * (uCurrentFrameIndex + 1), " "],
+        axOutputHeader = [guStackTreeColor, " │" * (uCurrentFrameIndex + 1), " "],
         asModuleSourceCode = asModuleSourceCode,
         uStartLineNumber = oException.lineno - 1,
         uEndLineNumber = oException.lineno + 1,
@@ -67,8 +72,8 @@ def faasOutputStack(oStack, oException = None, bAddHeader = True):
       uEndLineNumberSize = len(str(min(oException.lineno + 2, len(asModuleSourceCode) + 1)));
       aasOutputLines += [
         [
-          guStackTreeColor, " \u2502" * (uCurrentFrameIndex + 1), " ",
-          guStackAtExceptionColumnIndicatorColor, " " * (uEndLineNumberSize + oException.offset), "\u25B2"
+          guStackTreeColor, " │" * (uCurrentFrameIndex + 1), " ",
+          guStackAtExceptionColumnIndicatorColor, " " * (uEndLineNumberSize + oException.offset), "▲"
         ]
       ];
       sException = "%s(%s at character %d)" % (oException.__class__.__name__, repr(oException.msg), oException.offset);
@@ -80,8 +85,12 @@ def faasOutputStack(oStack, oException = None, bAddHeader = True):
       sException = repr(oException);
     aasOutputLines += [
       [
-        guStackTreeColor, " \u2502" * uNextFrameIndex, " \u251C", "\u2500\u2534" * (uCurrentFrameIndex - uNextFrameIndex - 1), "\u2500\u2518",
-        guStackAtExceptionInformationColor, " ==\u25BA ", sException,
+        guStackTreeColor,
+          " │" * uNextFrameIndex,
+          " ├",
+          "─┴" * (uCurrentFrameIndex - uNextFrameIndex - 1),
+          "─┘",
+        guStackAtExceptionInformationColor, " ==► ", sException,
       ]
     ];
   while auExceptionReraisingFrameIndices:
@@ -90,14 +99,14 @@ def faasOutputStack(oStack, oException = None, bAddHeader = True):
     oFrame = oStack.aoFrames[uCurrentFrameIndex];
     aasOutputLines += [
       [
-        guStackTreeColor, " \u2502" * (oFrame.uIndex + 1), " ",
+        guStackTreeColor, " │" * (oFrame.uIndex + 1), " ",
         guStackAfterExceptionCallDescriptorColor, oFrame.sCallDescription,
         guStackAfterExceptionCallDescriptorAndSourceFilePathJoinerColor, " @ ",
         guStackAfterExceptionSourceFilePathColor, oFrame.sLastExecutedCodeLocation,
       ]
     ];
     aasOutputLines += faasOutputSourceCode(
-      axOutputHeader = [guStackTreeColor, " \u2502" * (oFrame.uIndex + 1), " "],
+      axOutputHeader = [guStackTreeColor, " │" * (oFrame.uIndex + 1), " "],
       asModuleSourceCode = oFrame.asModuleSourceCode,
       uStartLineNumber = oFrame.uLastExecutedLineNumber - 1,
       uEndLineNumber = oFrame.uLastExecutedLineNumber + 1,
@@ -107,8 +116,11 @@ def faasOutputStack(oStack, oException = None, bAddHeader = True):
     );
     aasOutputLines += [
       [
-        guStackTreeColor, " \u2502" * (uNextFrameIndex), " \u251C" if uNextFrameIndex >= 0 else "", \
-            "\u2500\u2534" * (uCurrentFrameIndex - uNextFrameIndex - 1), "\u2500\u2518 ",
+        guStackTreeColor,
+          " │" * uNextFrameIndex,
+          " ├" if uNextFrameIndex >= 0 else "", \
+          "─┴" * (uCurrentFrameIndex - uNextFrameIndex - 1),
+          "─┘",
         guStackAfterExceptionActiveSourceCodeColor, oFrame.sLastExecutedSourceCode or "<no code>",
       ]
     ];

@@ -1,5 +1,3 @@
-from ..mColors import *;
-
 def fdxExceptionDetailsForSyntaxError(oException):
   return {
     "aasConsoleOutputLines": [
@@ -10,7 +8,7 @@ def fdxExceptionDetailsForSyntaxError(oException):
         guExceptionInformationColor, ":",
       ],
       [
-        guExceptionInformationColor, "\u25BA ", oException.msg,
+        guExceptionInformationColor, "  ", oException.msg,
       ],
     ],
     "dxHiddenProperties": {
@@ -25,3 +23,6 @@ def fdxExceptionDetailsForSyntaxError(oException):
     },
     "bShowLocals": False,
   };
+
+from ..mColorsAndChars import *;
+

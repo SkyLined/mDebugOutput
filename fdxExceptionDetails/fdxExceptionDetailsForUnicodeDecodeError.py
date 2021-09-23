@@ -1,5 +1,3 @@
-from ..mColors import *;
-
 def fdxExceptionDetailsForUnicodeDecodeError(oException):
   sInputString = oException.object;
   sOffensiveChars = sInputString[oException.start: oException.end];
@@ -57,3 +55,6 @@ def fdxExceptionDetailsForUnicodeDecodeError(oException):
     "reason": oException.reason,
     "start": oException.start,
   };
+
+from ..mColorsAndChars import *;
+

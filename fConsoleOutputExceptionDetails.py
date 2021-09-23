@@ -9,7 +9,6 @@ def fConsoleOutputExceptionDetails(oException, o0Traceback = None, o0PythonThrea
     # Not sure why I am added this code but I believe it may be a special handler for internal errors.
     import os, traceback
     traceback.print_exception(oException.__class__, oException, oTraceback);
-    os._exit(3);
   oStack = cCallStack.foFromTraceback(oTraceback, o0PythonThread);
   
   sBoxTitle = "Fatal %s.%s Exception in thread 0x%X" % (oException.__class__.__module__, oException.__class__.__name__, oStack.uThreadId);
@@ -49,4 +48,4 @@ from .faasCreateConsoleOutputForException import faasCreateConsoleOutputForExcep
 from .faasCreateConsoleOutputForStack import faasCreateConsoleOutputForStack;
 from .fConsoleOutput import fConsoleOutput;
 from .gaoHideFunctionsForPythonCodes import gaoHideFunctionsForPythonCodes;
-from .mColors import *;
+from .mColorsAndChars import *;

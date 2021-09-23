@@ -1,7 +1,5 @@
 import re;
 
-from ..mColors import *;
-
 def fdxExceptionDetailsForUnboundLocalError(oException):
   if len(oException.args) != 1:
     return {};
@@ -22,3 +20,6 @@ def fdxExceptionDetailsForUnboundLocalError(oException):
       "with_traceback": oException.with_traceback,
     },
   };
+
+from ..mColorsAndChars import *;
+

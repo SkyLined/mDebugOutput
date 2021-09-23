@@ -23,4 +23,4 @@ def fdxExceptionDetailsForValueError(oException):
   };
 
 from ..ShowDebugOutput import ShowDebugOutput;
-from ..mColors import *;
+from ..mColorsAndChars import *;

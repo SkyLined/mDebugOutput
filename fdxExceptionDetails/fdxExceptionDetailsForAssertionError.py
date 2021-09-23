@@ -1,4 +1,3 @@
-from ..mColors import *;
 
 def fdxExceptionDetailsForAssertionError(oException):
   if len(oException.args) != 1:
@@ -14,3 +13,6 @@ def fdxExceptionDetailsForAssertionError(oException):
       "with_traceback": oException.with_traceback,
     },
   };
+
+from ..mColorsAndChars import *;
+

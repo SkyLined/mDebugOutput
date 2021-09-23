@@ -1,7 +1,5 @@
 import re;
 
-from ..mColors import *;
-
 def fdxExceptionDetailsForImportError(oException):
   if len(oException.args) != 1:
     return {
@@ -26,3 +24,6 @@ def fdxExceptionDetailsForImportError(oException):
     }, 
     "bShowLocals": False,
   };
+
+from ..mColorsAndChars import *;
+

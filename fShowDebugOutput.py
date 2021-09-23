@@ -3,6 +3,7 @@ from .fbIsDebugOutputEnabledForSourceFilePathAndClass import fbIsDebugOutputEnab
 from .fDebugOutputHelper import fDebugOutputHelper;
 from .fTerminateWithException import fTerminateWithException;
 from .mGlobals import *;
+guExitCodeInternalError = 1; # This is the common default I use. There's currently no good way to set this per application.
 
 def fShowDebugOutput(sMessage):
   try:
@@ -16,5 +17,5 @@ def fShowDebugOutput(sMessage):
         sMessage
       );
   except Exception as oException:
-    fTerminateWithException(oException);
+    fTerminateWithException(oException, guExitCodeInternalError);
 
