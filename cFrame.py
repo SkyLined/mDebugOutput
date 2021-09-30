@@ -1,6 +1,5 @@
 import inspect, os, sys, threading;
 
-from .HideInCallStack import HideInCallStack;
 from .mColorsAndChars import *;
 # The rest of the imports are done at the bottom to prevent import loops.
 
@@ -13,7 +12,6 @@ gbDebugDumpRawStacksAndTracebacks = False;
 
 class cFrame():
   @classmethod
-  @HideInCallStack
   def foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(cClass, oPythonFrame, oPythonThread, u0ExceptionLineNumber, u0ExceptionCharacterNumber):
     oPythonCode = oPythonFrame.f_code;
     uLastExecutedLineNumber = oPythonFrame.f_lineno;
@@ -25,7 +23,6 @@ class cFrame():
     );
   
   @classmethod
-  @HideInCallStack
   def foForCurrentThread(cClass, uEndIndex = 0):
     # Create a list of all PythonFrames on the stack in the current thread.
     oPythonFrame = inspect.currentframe();
@@ -36,7 +33,7 @@ class cFrame():
     uCurrentEndIndex = 0;
     while oPythonFrame:
       aoPythonFrames.insert(0, oPythonFrame);
-      if oPythonFrame.f_code not in gaoHideFunctionsForPythonCodes:
+      if "__mDebugOutput_HideInCallStack" not in oPythonFrame.f_code.co_varnames:
         if uEndIndex == uCurrentEndIndex:
           if oWantedPythonFrame is None:
             oWantedPythonFrame = oPythonFrame;
@@ -50,7 +47,7 @@ class cFrame():
       print("--[ cCallStack.cFrame.foForCurrentThread ]".ljust(80, "-"));
       uIndex = 0;
       for oPythonFrame in aoPythonFrames:
-        if oPythonFrame.f_code in gaoHideFunctionsForPythonCodes:
+        if "__mDebugOutput_HideInCallStack" in oPythonFrame.f_code.co_varnames:
           fDumpPythonFrame(oPythonFrame, "  - ", "Hidden code");
         else:
           uCurrentEndIndex -= 1;
@@ -70,13 +67,11 @@ class cFrame():
     );
   
   @classmethod
-  @HideInCallStack
   def foForThisFunction(cClass):
     # A call to this function will be at the top of the stack, so we need to skip that to get to our caller.
     return cClass.foForCurrentThread();
   
   @classmethod
-  @HideInCallStack
   def foForThisFunctionsCaller(cClass):
     # A call to this function will be at the top of the stack, so we need to skip that to get to our caller.
     return cClass.foForCurrentThread(uEndIndex = 1); 
@@ -312,5 +307,4 @@ from .fDumpPythonFrame import fDumpPythonFrame;
 from .fDumpTraceback import fDumpTraceback;
 from .fsGetClassAndFunctionForClassAndCode import fsGetClassAndFunctionForClassAndCode;
 from .ftxGetFunctionsMethodInstanceAndClassForPythonCode import ftxGetFunctionsMethodInstanceAndClassForPythonCode;
-from .gaoHideFunctionsForPythonCodes import gaoHideFunctionsForPythonCodes;
 

@@ -1,7 +1,5 @@
 import functools, inspect, sys, threading, time;
 
-from .gaoHideFunctionsForPythonCodes import gaoHideFunctionsForPythonCodes;
-
 gbShowInternalDebugOutput = False;
 guExceptionAsStringMaxSize = 400;
 guArgumentAsStringMaxSize = 200;
@@ -44,7 +42,6 @@ def ShowDebugOutput(fxFunction):
     print("  sFirstArgumentName: %s" % sFirstArgumentName);
   
   @functools.wraps(fxFunction)
-  @HideInCallStack
   def fxFunctionWrapper(*txCallArgumentValues, **dxCallArgumentValues):
     try:
       oInstance = None;
@@ -221,7 +218,6 @@ from .fsToString import fsToString;
 from .fTerminateWithException import fTerminateWithException;
 from .ftocGetInstanceAndClassForUnknown import ftocGetInstanceAndClassForUnknown;
 from .ftxGetFunctionsMethodInstanceAndClassForPythonCode import ftxGetFunctionsMethodInstanceAndClassForPythonCode;
-from .HideInCallStack import HideInCallStack;
 from .mGlobals import *;
 
 # ShowDebugOutput should have an attribute "oFunctionWrapperCode" for

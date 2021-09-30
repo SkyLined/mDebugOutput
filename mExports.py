@@ -8,7 +8,6 @@ from .fsToString import fsToString;
 from .fTerminateWithConsoleOutput import fTerminateWithConsoleOutput;
 from .fTerminateWithDeadlock import fTerminateWithDeadlock;
 from .fTerminateWithException import fTerminateWithException;
-from .HideInCallStack import HideInCallStack;
 from .ShowDebugOutput import ShowDebugOutput;
 
 __all__ = [
@@ -22,6 +21,5 @@ __all__ = [
   "fTerminateWithConsoleOutput",
   "fTerminateWithDeadlock",
   "fTerminateWithException",
-  "HideInCallStack", # Use with caution!
   "ShowDebugOutput",
 ];

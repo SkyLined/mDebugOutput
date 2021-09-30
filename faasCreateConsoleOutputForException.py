@@ -1,8 +1,5 @@
-from .HideInCallStack import HideInCallStack;
-
 guMaxNumberOfLocalVariablesToShow = 40;
 
-@HideInCallStack
 def faasCreateConsoleOutputForException(oException, oTraceback, oStack):
   dxExceptionDetails = fdxExceptionDetails(oException, oTraceback);
   a0asConsoleOutputLines = dxExceptionDetails.get("aasConsoleOutputLines", None);

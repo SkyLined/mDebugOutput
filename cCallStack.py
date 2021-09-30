@@ -5,14 +5,16 @@ from .fasGetSourceCode import fasGetSourceCode;
 from .faasCreateConsoleOutputForStack import faasCreateConsoleOutputForStack;
 from .fDumpPythonFrame import fDumpPythonFrame;
 from .fsGetClassAndFunctionForClassAndCode import fsGetClassAndFunctionForClassAndCode;
-from .gaoHideFunctionsForPythonCodes import gaoHideFunctionsForPythonCodes;
-from .HideInCallStack import HideInCallStack;
 
 gbDebugDumpRawStacksAndTracebacks = False;
 
 class cCallStack():
+  # NOTE: functions that have a local variable named `__mDebugOutput_HideInCallStack` will be excluded from the stack!
+  # This can be used by utility functions that make it easy to perform an operation that would normally be done inline.
+  # For instance, a function "B" that is called for each argument passed to a function "A" in order to check if the
+  # argument is of the correct type and which throws an exception if it is not: this exception makes more sense if it
+  # was thrown function function "A", so function "B" should define this local variable to hide it in the stack.
   @classmethod
-  @HideInCallStack
   def __foFromPythonFramesAndExceptionLineAndCharacterNumbers(cClass, atxPythonFramesAndExceptionLineAndCharacterNumbers, oPythonThread = None):
     oPythonThread = oPythonThread or threading.currentThread();
     return cClass([
@@ -20,19 +22,15 @@ class cCallStack():
       for (oPythonFrame, u0ExceptionLineNumber, u0ExceptionCharacterNumber) in atxPythonFramesAndExceptionLineAndCharacterNumbers
     ]);
   @classmethod
-  @HideInCallStack
   def foForThisFunction(cClass):
     return cClass.foForCurrentThread();
   @classmethod
-  @HideInCallStack
   def foForThisFunctionsCaller(cClass):
     return cClass.foForCurrentThread(uEndIndex = 1);
   @classmethod
-  @HideInCallStack
   def foForCurrentThread(cClass, uStartIndex = None, uEndIndex = None):
     return cClass.foFromPythonFrameAndThread(inspect.currentframe(), threading.currentThread(), uStartIndex, uEndIndex);
   @classmethod
-  @HideInCallStack
   def foFromPythonFrameAndThread(cClass, oPythonFrame, oPythonThread, uStartIndex = 0, uEndIndex = 0):
     # Create a list of all PythonFrames on the stack in the current thread.
     aoPythonFrames = [];
@@ -41,7 +39,7 @@ class cCallStack():
     uCurrentEndIndex = -1;
     while oPythonFrame:
       aoPythonFrames.insert(0, oPythonFrame);
-      if oPythonFrame.f_code not in gaoHideFunctionsForPythonCodes:
+      if "__mDebugOutput_HideInCallStack" not in oPythonFrame.f_code.co_varnames:
         uCurrentEndIndex += 1;
       oPythonFrame = oPythonFrame.f_back;
     if gbDebugDumpRawStacksAndTracebacks:
@@ -53,7 +51,7 @@ class cCallStack():
     uIndex = 0;
     atxPythonFramesAndExceptionLineAndCharacterNumbers = [];
     for oPythonFrame in aoPythonFrames:
-      if oPythonFrame.f_code in gaoHideFunctionsForPythonCodes:
+      if "__mDebugOutput_HideInCallStack" in oPythonFrame.f_code.co_varnames:
         if gbDebugDumpRawStacksAndTracebacks:
           fDumpPythonFrame(oPythonFrame, "  - ", "Hidden code");
       else:
@@ -75,7 +73,6 @@ class cCallStack():
     return cClass.__foFromPythonFramesAndExceptionLineAndCharacterNumbers(atxPythonFramesAndExceptionLineAndCharacterNumbers, oPythonThread);
   
   @classmethod
-  @HideInCallStack
   def faoForAllThreads(cClass, uCurrentThreadEndIndex = 0):
      doPythonThread_by_uThreadId = dict([
       (oPythonThread.ident, oPythonThread)
@@ -101,7 +98,7 @@ class cCallStack():
     uIndex = 0;
     while oTraceback:
       oPythonFrame = oTraceback.tb_frame;
-      if oPythonFrame.f_code in gaoHideFunctionsForPythonCodes:
+      if "__mDebugOutput_HideInCallStack" in oPythonFrame.f_code.co_varnames:
         if gbDebugDumpRawStacksAndTracebacks:
           fDumpPythonFrame(oPythonFrame, "  - ", "Hidden code");
       else:
