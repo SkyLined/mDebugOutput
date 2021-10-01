@@ -73,7 +73,8 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
         aasConsoleOutputLines += [
           [
             guStackTreeColor, " ╷" * uCurrentFrameIndex, " │", 
-            guStackAtExceptionColumnIndicatorColor, " ╒", "═" * (uEndLineNumberSize + oException.offset), "╛"
+            # The below calculation will never give a negative result because uEndLineNumberSize is always larger than 1
+            guStackAtExceptionColumnIndicatorColor, " ╭", "─" * (uEndLineNumberSize + oException.offset - 1), "╯"
           ]
         ];
         sException = "%s(%s at character %d)" % (oException.__class__.__name__, repr(oException.msg), oException.offset);
@@ -95,10 +96,10 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
         ] if uCurrentFrameIndex != uNextFrameIndex else [
           " │",
         ] if uCurrentFrameIndex != 0 else [
-          " ▀",
+          " ▲",
         ]
       ) + [
-        guStackExceptionInformationColor, " ■ ", sException,
+        guStackExceptionInformationColor, " ▲ ", sException,
       ]
     ];
   while auExceptionReraisingFrameIndices:
@@ -130,7 +131,7 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
       ] if uCurrentFrameIndex != 0 else []) + [
         "═╛",
       ] + ([
-        guStackTerminatedInformationColor, " ■ Application terminated because exception was not handled.",
+        guStackTerminatedInformationColor, " ▲ Application terminated because exception was not handled.",
       ] if uCurrentFrameIndex == 0 else [])
     ];
   
