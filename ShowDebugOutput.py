@@ -43,6 +43,7 @@ def ShowDebugOutput(fxFunction):
   
   @functools.wraps(fxFunction)
   def fxFunctionWrapper(*txCallArgumentValues, **dxCallArgumentValues):
+    __mDebugOutput_HideInCallStack = True; # Any exception in this code is likely not to be caused by this code.
     try:
       oInstance = None;
       cClass = None;
