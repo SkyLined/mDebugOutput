@@ -87,21 +87,31 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
     else:
       sException = repr(oException);
     # Exception
-    aasConsoleOutputLines += [
-      [
-        guStackTreeColor, " ╷" * uNextFrameIndex, 
-      ] + (
+    asExceptionLines = sException.split("\n");
+    uLineNumber = 0;
+    sHeader1 = (
+      " ╒" + ("═" * (2 * (uCurrentFrameIndex - uNextFrameIndex) - 1)) + "╛"
+    ) if uCurrentFrameIndex != uNextFrameIndex else (
+      " │"
+    ) if uCurrentFrameIndex != 0 else (
+      ""
+    );
+    sHeaderN = (
+      " │" + (" " * (2 * (uCurrentFrameIndex - uNextFrameIndex)))
+    ) if uCurrentFrameIndex != uNextFrameIndex else (
+      sHeader1
+    );
+    for sExceptionLine in asExceptionLines:
+      uLineNumber += 1;
+      aasConsoleOutputLines += [
         [
-          " ╒", "═" * (2 * (uCurrentFrameIndex - uNextFrameIndex) - 1), "╛",
-        ] if uCurrentFrameIndex != uNextFrameIndex else [
-          " │",
-        ] if uCurrentFrameIndex != 0 else [
-          " ▲",
+          guStackTreeColor, " ╷" * uNextFrameIndex, 
+        ] + [
+          sHeader1 if uLineNumber == 1 else sHeaderN
+        ] + [
+          guStackExceptionInformationColor, " ▲ " if uLineNumber == 1 else "   ", sExceptionLine.rstrip("\r"),
         ]
-      ) + [
-        guStackExceptionInformationColor, " ▲ ", sException,
-      ]
-    ];
+      ];
   while auExceptionReraisingFrameIndices:
     uLastFrameIndex = uCurrentFrameIndex;
     uCurrentFrameIndex = uNextFrameIndex;
