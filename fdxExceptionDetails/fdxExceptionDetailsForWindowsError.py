@@ -34,7 +34,10 @@ def fdxExceptionDetailsForWindowsError(oException):
   return {
     "aasConsoleOutputLines": aasConsoleOutputLines,
     "dxHiddenProperties": {
-      "args": (oException.errno, oException.strerror) if oException.winerror is None else (oException.errno, oException.strerror, None, oException.winerror, None),
+      "args": (
+        (oException.errno, oException.strerror) if oException.winerror is None else
+        (oException.errno, oException.strerror, None, oException.winerror, None)
+      ),
       "with_traceback": oException.with_traceback,
       "errno": oException.errno if oException.winerror is None else oException.winerror,
       "filename": None,
