@@ -1,13 +1,6 @@
-try: 
-  import json as m0json;
-except:
-  m0json = None;
-
 from .fdxExceptionDetailsForAssertionError import fdxExceptionDetailsForAssertionError;
 from .fdxExceptionDetailsForAttributeError import fdxExceptionDetailsForAttributeError;
 from .fdxExceptionDetailsForImportError import fdxExceptionDetailsForImportError;
-if m0json:
-  from .fdxExceptionDetailsForJSONDecodeError import fdxExceptionDetailsForJSONDecodeError;
 from .fdxExceptionDetailsForKeyError import fdxExceptionDetailsForKeyError;
 from .fdxExceptionDetailsForNameError import fdxExceptionDetailsForNameError;
 from .fdxExceptionDetailsForSyntaxError import fdxExceptionDetailsForSyntaxError;
@@ -16,6 +9,19 @@ from .fdxExceptionDetailsForUnboundLocalError import fdxExceptionDetailsForUnbou
 from .fdxExceptionDetailsForUnicodeDecodeError import fdxExceptionDetailsForUnicodeDecodeError;
 from .fdxExceptionDetailsForValueError import fdxExceptionDetailsForValueError;
 from .fdxExceptionDetailsForWindowsError import fdxExceptionDetailsForWindowsError;
+# Optional
+try: 
+  import json as m0json;
+except:
+  m0json = None;
+else:
+  from .fdxExceptionDetailsForJSONDecodeError import fdxExceptionDetailsForJSONDecodeError;
+try:
+  import mWindowsSDK as m0WindowsSDK;
+except:
+  m0WindowsSDK = None;
+else:
+  from .fdxExceptionDetailsFor_mWindowsSDK_cDLL_cInvalidFunctionArgumentsException import fdxExceptionDetailsFor_mWindowsSDK_cDLL_cInvalidFunctionArgumentsException;
 
 def fdxExceptionDetails(oException, oTraceback):
   if isinstance(oException, AssertionError):
@@ -24,8 +30,6 @@ def fdxExceptionDetails(oException, oTraceback):
     return fdxExceptionDetailsForAttributeError(oException);
   elif isinstance(oException, ImportError):
     return fdxExceptionDetailsForImportError(oException);
-  elif m0json and isinstance(oException, m0json.decoder.JSONDecodeError):
-    return fdxExceptionDetailsForJSONDecodeError(oException);
   elif isinstance(oException, KeyError):
     return fdxExceptionDetailsForKeyError(oException);
   elif isinstance(oException, NameError):
@@ -42,5 +46,9 @@ def fdxExceptionDetails(oException, oTraceback):
     return fdxExceptionDetailsForValueError(oException);
   elif isinstance(oException, WindowsError):
     return fdxExceptionDetailsForWindowsError(oException);
+  elif m0json and isinstance(oException, m0json.decoder.JSONDecodeError):
+    return fdxExceptionDetailsForJSONDecodeError(oException);
+  elif m0WindowsSDK and isinstance(oException, m0WindowsSDK.cDLL.cInvalidFunctionArgumentsException):
+    return fdxExceptionDetailsFor_mWindowsSDK_cDLL_cInvalidFunctionArgumentsException(oException);
   else:
     return {};
