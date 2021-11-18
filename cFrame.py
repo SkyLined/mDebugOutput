@@ -33,7 +33,7 @@ class cFrame():
     uCurrentEndIndex = 0;
     while oPythonFrame:
       aoPythonFrames.insert(0, oPythonFrame);
-      if "__mDebugOutput_HideInCallStack" not in oPythonFrame.f_code.co_varnames:
+      if "mDebugOutput_HideInCallStack" not in oPythonFrame.f_code.co_varnames:
         if uEndIndex == uCurrentEndIndex:
           if oWantedPythonFrame is None:
             oWantedPythonFrame = oPythonFrame;
@@ -47,7 +47,7 @@ class cFrame():
       print("--[ cCallStack.cFrame.foForCurrentThread ]".ljust(80, "-"));
       uIndex = 0;
       for oPythonFrame in aoPythonFrames:
-        if "__mDebugOutput_HideInCallStack" in oPythonFrame.f_code.co_varnames:
+        if "mDebugOutput_HideInCallStack" in oPythonFrame.f_code.co_varnames:
           fDumpPythonFrame(oPythonFrame, "  - ", "Hidden code");
         else:
           uCurrentEndIndex -= 1;

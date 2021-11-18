@@ -9,7 +9,7 @@ from .fsGetClassAndFunctionForClassAndCode import fsGetClassAndFunctionForClassA
 gbDebugDumpRawStacksAndTracebacks = False;
 
 class cCallStack():
-  # NOTE: functions that have a local variable named `__mDebugOutput_HideInCallStack` will be excluded from the stack!
+  # NOTE: functions that have a local variable named `mDebugOutput_HideInCallStack` will be excluded from the stack!
   # This can be used by utility functions that make it easy to perform an operation that would normally be done inline.
   # For instance, a function "B" that is called for each argument passed to a function "A" in order to check if the
   # argument is of the correct type and which throws an exception if it is not: this exception makes more sense if it
@@ -39,7 +39,7 @@ class cCallStack():
     uCurrentEndIndex = -1;
     while oPythonFrame:
       aoPythonFrames.insert(0, oPythonFrame);
-      if "__mDebugOutput_HideInCallStack" not in oPythonFrame.f_code.co_varnames:
+      if "mDebugOutput_HideInCallStack" not in oPythonFrame.f_code.co_varnames:
         uCurrentEndIndex += 1;
       oPythonFrame = oPythonFrame.f_back;
     if gbDebugDumpRawStacksAndTracebacks:
@@ -51,7 +51,7 @@ class cCallStack():
     uIndex = 0;
     atxPythonFramesAndExceptionLineAndCharacterNumbers = [];
     for oPythonFrame in aoPythonFrames:
-      if "__mDebugOutput_HideInCallStack" in oPythonFrame.f_code.co_varnames:
+      if "mDebugOutput_HideInCallStack" in oPythonFrame.f_code.co_varnames:
         if gbDebugDumpRawStacksAndTracebacks:
           fDumpPythonFrame(oPythonFrame, "  - ", "Hidden code");
       else:
@@ -98,7 +98,7 @@ class cCallStack():
     uIndex = 0;
     while oTraceback:
       oPythonFrame = oTraceback.tb_frame;
-      if "__mDebugOutput_HideInCallStack" in oPythonFrame.f_code.co_varnames:
+      if "mDebugOutput_HideInCallStack" in oPythonFrame.f_code.co_varnames:
         if gbDebugDumpRawStacksAndTracebacks:
           fDumpPythonFrame(oPythonFrame, "  - ", "Hidden code");
       else:

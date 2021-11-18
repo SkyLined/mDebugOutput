@@ -11,7 +11,7 @@ def fDumpPythonFrame(oPythonFrame, sPrefix = "", sSuffix = "", bExpand = True):
     while oPythonFrame:
       uIndex += 1;
       print("%sF#%d%s %s @ %s/%d%s" % (
-        sPrefix, uIndex, "*" if "__mDebugOutput_HideInCallStack" in oPythonFrame.f_code.co_varnames else " ",
+        sPrefix, uIndex, "*" if "mDebugOutput_HideInCallStack" in oPythonFrame.f_code.co_varnames else " ",
         oPythonFrame.f_code.co_name,
         oPythonFrame.f_code.co_filename, oPythonFrame.f_lineno,
         " (%s)" % sSuffix if sSuffix else ""

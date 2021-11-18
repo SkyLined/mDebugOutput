@@ -55,12 +55,12 @@ def fsToString(xData, uMaxLength = 1000):
     try:
       sData = repr(xData);
     except:
-      sData = "<class %s>" % (repr(xData.__class__.__name__),);
+      sData = "<instance %s:%s>" % (str(xData.__class__.__module__), str(xData.__class__.__name__));
     else:
       if sData[:1] != "<":
-        sData = "<class %s: %s>" % (xData.__class__.__name__, repr(sData));
+        sData = "<instance %s:%s %s>" % (str(xData.__class__.__module__), str(xData.__class__.__name__), repr(sData));
   elif inspect.isclass(xData):
-    sData = xData.__name__;
+    sData = "<%s:%s>" % (str(xData.__module__), str(xData.__name__));
   else:
     raise AssertionError("Unknown object type %s: %s" % (type(xData), repr(xData)));
   if uMaxLength is not None:
