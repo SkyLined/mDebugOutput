@@ -12,21 +12,22 @@ assert len(aoPythonThreads) == 1, \
     "Expected only 1 thread!";
 guMainThreadId = aoPythonThreads[0].ident;
 
-def fDebugOutputHelper(uThreadId, sThreadName, sSourceFilePath, uLineNumber, xOutputLines, uIndentationChange = 0, bAlwaysShow = False, bIsReturnAddress = False):
+def fDebugOutputHelper(u0ThreadId, s0ThreadName, sSourceFilePath, uLineNumber, xOutputLines, uIndentationChange = 0, bAlwaysShow = False, bIsReturnAddress = False):
   global guThreadColor_by_uThreadId, gauThreadColors;
   oConsole = foConsoleLoader();
   
   asOutputLines = xOutputLines if isinstance(xOutputLines, list) else [xOutputLines];
   sThreadIdHeader = "".join([
-    "%4X" % uThreadId,
-    "\u2022" if uThreadId == guMainThreadId else "\u00B7",
-    sThreadName or "<unnamed>",
-  ])[:64].ljust(64);
+    "%4X" % u0ThreadId,
+    "\u2022" if u0ThreadId == guMainThreadId else "\u00B7",
+    s0ThreadName or "<unnamed>",
+  ])[:64].ljust(64) if u0ThreadId is not None else "<unknown thread>";
   sTime = "%8.4f" % (time.time() - gnStartTime);
   uIndex = 0;
-  uIndentation = guIndentation_by_uThreadId.setdefault(uThreadId, 0);
+  uIndentation = guIndentation_by_uThreadId.setdefault(u0ThreadId, 0) if u0ThreadId is not None else 0;
   if uIndentationChange == 1:
-    guIndentation_by_uThreadId[uThreadId] += 1;
+    if u0ThreadId is not None:
+      guIndentation_by_uThreadId[u0ThreadId] += 1;
     sSingleIndentationHeader = sFirstIndentationHeader = (" \u2502" * (uIndentation - 1)) + (" \u251C" if uIndentation else "") + "\u2500\u2510";
     uIndentation += 1;
     sMiddleIndentationHeader = sLastIndentationHeader = (" \u2502" * uIndentation);
@@ -36,10 +37,11 @@ def fDebugOutputHelper(uThreadId, sThreadName, sSourceFilePath, uLineNumber, xOu
     sSingleIndentationHeader = sFirstIndentationHeader = \
         sMiddleIndentationHeader = sLastIndentationHeader = " \u2502" * uIndentation;
   else:
-    if guIndentation_by_uThreadId[uThreadId] == 1:
-      del guIndentation_by_uThreadId[uThreadId];
-    else:
-      guIndentation_by_uThreadId[uThreadId] -= 1;
+    if u0ThreadId is not None:
+      if guIndentation_by_uThreadId[u0ThreadId] == 1:
+        del guIndentation_by_uThreadId[u0ThreadId];
+      else:
+        guIndentation_by_uThreadId[u0ThreadId] -= 1;
     sFirstIndentationHeader = sMiddleIndentationHeader = " \u2502" * uIndentation;
     uIndentation -= 1;
     sSingleIndentationHeader = sLastIndentationHeader = (" \u2502" * (uIndentation - 1)) + (" \u251C" if uIndentation else "") + "\u2500\u2518";
@@ -83,7 +85,7 @@ def fDebugOutputHelper(uThreadId, sThreadName, sSourceFilePath, uLineNumber, xOu
   # Actually output the lines:
   oConsole.fLock();
   try:
-    uThreadColor = guThreadColor_by_uThreadId.get(uThreadId);
+    uThreadColor = guThreadColor_by_uThreadId.get(u0ThreadId) if u0ThreadId is not None else gauThreadColors[0];
     if uThreadColor is None:
       duCount_by_uThreadColor = dict([(uThreadColor, 0) for uThreadColor in gauThreadColors]);
       for uThreadColor in guThreadColor_by_uThreadId.values():
@@ -91,7 +93,7 @@ def fDebugOutputHelper(uThreadId, sThreadName, sSourceFilePath, uLineNumber, xOu
       uLowestCount = min([uCount for uCount in duCount_by_uThreadColor.values()]);
       for uThreadColor in gauThreadColors:
         if duCount_by_uThreadColor[uThreadColor] == uLowestCount:
-          guThreadColor_by_uThreadId[uThreadId] = uThreadColor;
+          guThreadColor_by_uThreadId[u0ThreadId] = uThreadColor;
           break;
       else:
         raise AssertionError("Stars are not alligned correctly.");

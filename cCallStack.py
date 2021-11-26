@@ -15,10 +15,14 @@ class cCallStack():
   # argument is of the correct type and which throws an exception if it is not: this exception makes more sense if it
   # was thrown function function "A", so function "B" should define this local variable to hide it in the stack.
   @classmethod
-  def __foFromPythonFramesAndExceptionLineAndCharacterNumbers(cClass, atxPythonFramesAndExceptionLineAndCharacterNumbers, oPythonThread = None):
-    oPythonThread = oPythonThread or threading.currentThread();
+  def __foFromPythonFramesAndExceptionLineAndCharacterNumbers(cClass, atxPythonFramesAndExceptionLineAndCharacterNumbers, o0PythonThread = None):
+    if o0PythonThread is None:
+      try: # This can fail during shutdown, so we catch any exceptions and ignore them.
+        o0PythonThread = threading.currentThread();
+      except:
+        pass;
     return cClass([
-      cFrame.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(oPythonFrame, oPythonThread, u0ExceptionLineNumber, None)
+      cFrame.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(oPythonFrame, o0PythonThread, u0ExceptionLineNumber, None)
       for (oPythonFrame, u0ExceptionLineNumber, u0ExceptionCharacterNumber) in atxPythonFramesAndExceptionLineAndCharacterNumbers
     ]);
   @classmethod
@@ -31,7 +35,7 @@ class cCallStack():
   def foForCurrentThread(cClass, uStartIndex = None, uEndIndex = None):
     return cClass.foFromPythonFrameAndThread(inspect.currentframe(), threading.currentThread(), uStartIndex, uEndIndex);
   @classmethod
-  def foFromPythonFrameAndThread(cClass, oPythonFrame, oPythonThread, uStartIndex = 0, uEndIndex = 0):
+  def foFromPythonFrameAndThread(cClass, oPythonFrame, o0PythonThread, uStartIndex = 0, uEndIndex = 0):
     # Create a list of all PythonFrames on the stack in the current thread.
     aoPythonFrames = [];
     # We are ignoring frames with hidden functions in our indices, so we need to
@@ -70,7 +74,7 @@ class cCallStack():
         uCurrentEndIndex -= 1;
     if gbDebugDumpRawStacksAndTracebacks:
       print("-" * 80);
-    return cClass.__foFromPythonFramesAndExceptionLineAndCharacterNumbers(atxPythonFramesAndExceptionLineAndCharacterNumbers, oPythonThread);
+    return cClass.__foFromPythonFramesAndExceptionLineAndCharacterNumbers(atxPythonFramesAndExceptionLineAndCharacterNumbers, o0PythonThread);
   
   @classmethod
   def faoForAllThreads(cClass, uCurrentThreadEndIndex = 0):
@@ -89,7 +93,7 @@ class cCallStack():
      ];
   
   @classmethod
-  def foFromTraceback(cClass, oTraceback, oPythonThread = None):
+  def foFromTraceback(cClass, oTraceback, o0PythonThread = None):
     assert oTraceback, \
         "A traceback is required!";
     if gbDebugDumpRawStacksAndTracebacks:
@@ -109,7 +113,7 @@ class cCallStack():
       oTraceback = oTraceback.tb_next;
     if gbDebugDumpRawStacksAndTracebacks:
       print("-" * 80);
-    oStack = cClass.__foFromPythonFramesAndExceptionLineAndCharacterNumbers(atxPythonFramesAndExceptionLineAndCharacterNumbers, oPythonThread);
+    oStack = cClass.__foFromPythonFramesAndExceptionLineAndCharacterNumbers(atxPythonFramesAndExceptionLineAndCharacterNumbers, o0PythonThread);
     return oStack;
   
   def __init__(oSelf, aoFrames):
@@ -125,12 +129,12 @@ class cCallStack():
       oFrame.oChildFrame = oSelf.aoFrames[uIndex + 1] if uIndex < len(oSelf.aoFrames) - 1 else None;
   
   @property
-  def uThreadId(oSelf):
-    return oSelf.aoFrames[0].uThreadId;
+  def u0ThreadId(oSelf):
+    return oSelf.aoFrames[0].u0ThreadId;
   
   @property
-  def sThreadName(oSelf):
-    return oSelf.aoFrames[0].sThreadName;
+  def s0ThreadName(oSelf):
+    return oSelf.aoFrames[0].s0ThreadName;
   
   @property
   def oTopFrame(oSelf):
@@ -140,9 +144,9 @@ class cCallStack():
     return faasCreateConsoleOutputForStack(oSelf, *txArguments, **dxArguments);
   
   def fsToString(oSelf):
-    return "<%s#%X thread = %d/0x%X (%s), %d frames @ %s>" % (
+    return "<%s#%X thread %s, %d frames @ %s>" % (
       oSelf.__class__.__name__, id(oSelf),
-      oSelf.uThreadId, oSelf.uThreadId, oSelf.sThreadName,
+      "%d/0x%X (%s)" % (oSelf.u0ThreadId, oSelf.u0ThreadId, oSelf.s0ThreadName) if oSelf.u0ThreadId is not None else "unknown",
       len(oSelf.aoFrames),
       oSelf.aoFrames[-1].sCallDescription
     );

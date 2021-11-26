@@ -6,9 +6,17 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
   if bAddHeader:
     aasConsoleOutputLines += [
       [
-        guStackHeaderColor, "Stack for thread ", guStackHeaderHighlightColor, "%d/0x%X" % (oStack.uThreadId, oStack.uThreadId),
-        guStackHeaderColor, " (", guStackHeaderHighlightColor, oStack.sThreadName or "<unnamed>", guStackHeaderColor, ")",
-        guStackHeaderColor, ":",
+        guStackHeaderColor, "Stack for ",
+        [
+          "thread ",
+          guStackHeaderHighlightColor, "%d/0x%X" % (oStack.u0ThreadId, oStack.u0ThreadId),
+          guStackHeaderColor, " (",
+          guStackHeaderHighlightColor, oStack.s0ThreadName or "<unnamed>",
+          guStackHeaderColor, ")",
+        ] if oStack.u0ThreadId is not None else [
+          "unknown thread"
+        ],
+        ":"
       ],
     ];
   bIsSyntaxError = isinstance(oException, SyntaxError);

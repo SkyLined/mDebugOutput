@@ -12,13 +12,13 @@ gbDebugDumpRawStacksAndTracebacks = False;
 
 class cFrame():
   @classmethod
-  def foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(cClass, oPythonFrame, oPythonThread, u0ExceptionLineNumber, u0ExceptionCharacterNumber):
+  def foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(cClass, oPythonFrame, o0PythonThread, u0ExceptionLineNumber, u0ExceptionCharacterNumber):
     oPythonCode = oPythonFrame.f_code;
     uLastExecutedLineNumber = oPythonFrame.f_lineno;
     (tsArgumentNames, stxArgumentsName, sdxArgumentsName, dxLocalVariables) = inspect.getargvalues(oPythonFrame);
     return cClass(
       oPythonCode, u0ExceptionLineNumber, u0ExceptionCharacterNumber, uLastExecutedLineNumber,
-      oPythonThread, 
+      o0PythonThread, 
       tsArgumentNames, stxArgumentsName, sdxArgumentsName, dxLocalVariables
     );
   
@@ -59,9 +59,13 @@ class cFrame():
             fDumpPythonFrame(oPythonFrame, "  - ", "uEndIndex = %s" % uCurrentEndIndex);
           uIndex += 1;
       print("-" * 80);
+    try: # This can fail during shutdown, so we catch any exceptions and ignore them.
+      o0PythonThread = threading.currentThread();
+    except:
+      o0PythonThread = None;
     return cClass.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(
       oPythonFrame = oWantedPythonFrame,
-      oPythonThread = threading.currentThread(),
+      o0PythonThread = o0PythonThread,
       u0ExceptionLineNumber = None,
       u0ExceptionCharacterNumber = None,
     );
@@ -79,7 +83,7 @@ class cFrame():
   def __init__(
     oSelf,
     oPythonCode, u0ExceptionLineNumber, u0ExceptionCharacterNumber, uLastExecutedLineNumber,
-    oPythonThread, 
+    o0PythonThread, 
     tsArgumentNames, stxArgumentsName, sdxArgumentsName, dxLocalVariables,
   ):
     oSelf.oPythonCode = oPythonCode;
@@ -87,8 +91,8 @@ class cFrame():
     oSelf.u0ExceptionCharacterNumber = u0ExceptionCharacterNumber;
     oSelf.u0ExceptionLineNumber = u0ExceptionLineNumber;
     oSelf.uLastExecutedLineNumber = uLastExecutedLineNumber;
-    oSelf.uThreadId = oPythonThread.ident;
-    oSelf.sThreadName = oPythonThread.name;
+    oSelf.u0ThreadId = o0PythonThread.ident if o0PythonThread else None;
+    oSelf.s0ThreadName = o0PythonThread.name if o0PythonThread else None;
     oSelf.tsArgumentNames = tsArgumentNames;
     oSelf.stxArgumentsName = stxArgumentsName;
     oSelf.sdxArgumentsName = sdxArgumentsName;
@@ -111,10 +115,13 @@ class cFrame():
     return oSelf.oPythonCode.co_filename;
   
   @property
-  def mModule(oSelf):
-    mModule = inspect.getmodule(oSelf.oPythonCode);
-    # This can return None if the module is currently being loaded.
-    return mModule;
+  def m0Module(oSelf):
+    try:
+      # This can return None if the module is currently being loaded
+      return inspect.getmodule(oSelf.oPythonCode);
+    except:
+      # This can throw an exception if Python is ending.
+      return None;
   
   @property
   def sSourceFileName(oSelf):
@@ -151,8 +158,8 @@ class cFrame():
         oSelf.__cCachedClass,
       ) = ftxGetFunctionsMethodInstanceAndClassForPythonCode(oPythonCode, xFirstArgument);
       oSelf.__bIsModuleCode = len(afxFunctions) == 0;
-      if oSelf.__bIsModuleCode and oSelf.mModule:
-        goPythonCode_by_mModule[oSelf.mModule] = oPythonCode;
+      if oSelf.__bIsModuleCode and oSelf.m0Module:
+        goPythonCode_by_mModule[oSelf.m0Module] = oPythonCode;
       oSelf.__fxCachedFunction = gfxFunction_by_oPythonCode[oPythonCode] = afxFunctions[0] if len(afxFunctions) == 1 else None;
       if oSelf.__oCachedInstance is None:
         gfxStaticOrClassMethod_by_oPythonCode[oPythonCode] = oSelf.__fxCachedMethod;
@@ -291,14 +298,15 @@ class cFrame():
     return "%s/%d" % (oSelf.sSourceFilePath, oSelf.uLastExecutedLineNumber);
   
   def fsToString(oSelf):
-    return "<%s#%X %s/%s @ %s, thread = %d/0x%X (%s)>" % (
+    return "<%s#%X %s/%s @ %s, thread %s>" % (
       oSelf.__class__.__name__, id(oSelf),
       oSelf.sCallDescription, 
-      "%d" % oSelf.uLastExecutedLineNumber if oSelf.u0ExceptionLineNumber is None else
-        "*%d" if oSelf.uLastExecutedLineNumber == oSelf.u0ExceptionLineNumber else
-        "*%d/%d" % (oSelf.u0ExceptionLineNumber, oSelf.u0LastExecutedLineNumber),
+      "%d" % oSelf.uLastExecutedLineNumber if oSelf.u0ExceptionLineNumber is None else \
+          "*%d" if oSelf.uLastExecutedLineNumber == oSelf.u0ExceptionLineNumber else \
+          "*%d/%d" % (oSelf.u0ExceptionLineNumber, oSelf.u0LastExecutedLineNumber),
       oSelf.sSourceFilePath,
-      oSelf.uThreadId, oSelf.uThreadId, oSelf.sThreadName,
+      "%d/0x%X (%s)" % (oSelf.u0ThreadId, oSelf.u0ThreadId, oSelf.s0ThreadName) if oSelf.u0ThreadId else \
+          "unknown",
     );
 
 from .fasGetSourceCode import fasGetSourceCode;

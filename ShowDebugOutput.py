@@ -45,6 +45,11 @@ def ShowDebugOutput(fxFunction):
   def fxFunctionWrapper(*txCallArgumentValues, **dxCallArgumentValues):
     mDebugOutput_HideInCallStack = True; # Any exception in this code is likely not to be caused by this code.
     try:
+      # This can fail if Python is ending, hence try....catch
+      o0PythonThread = threading.currentThread();
+    except:
+      o0PythonThread = None;
+    try:
       oInstance = None;
       cClass = None;
       if gbShowInternalDebugOutput:
@@ -120,12 +125,11 @@ def ShowDebugOutput(fxFunction):
           print("@ SHOW %s(%s) @ %s" % (sCallDescription, sCallArguments, repr(sSourceFilePath)));
       if bShowDebugOutput:
         fDebugOutputHelper(
-          oCallFrame.uThreadId, oCallFrame.sThreadName,
+          oCallFrame.u0ThreadId, oCallFrame.s0ThreadName,
           oCallFrame.sSourceFilePath, oCallFrame.uLastExecutedLineNumber,
           "%s(%s)" % (sCallDescription, sCallArguments),
           uIndentationChange = +1,
         );
-      oPythonThread = threading.currentThread();
     except Exception as oException:
       fTerminateWithException(oException, guExitCodeInternalError);
     if not bShowDebugOutput:
@@ -155,12 +159,12 @@ def ShowDebugOutput(fxFunction):
           for oTraceback in reversed(aoAdditionalTracebacksToShow):
             oExceptionFrame = cFrame.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(
               oPythonFrame = oTraceback.tb_frame,
-              oPythonThread = threading.currentThread(),
+              o0PythonThread = o0PythonThread,
               u0ExceptionLineNumber = oTraceback.tb_lineno,
               u0ExceptionCharacterNumber = None,
             );
             fDebugOutputHelper(
-              oExceptionFrame.uThreadId, oExceptionFrame.sThreadName,
+              oExceptionFrame.u0ThreadId, oExceptionFrame.s0ThreadName,
               oExceptionFrame.sSourceFilePath, oExceptionFrame.u0ExceptionLineNumber,
               "%s %sraise %s;" % (
                 " <" * uIndentation,
@@ -171,12 +175,12 @@ def ShowDebugOutput(fxFunction):
             uIndentation -= 1;
         oExceptionFrame = cFrame.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(
           oPythonFrame = oCurrentTraceback.tb_frame,
-          oPythonThread = threading.currentThread(),
+          o0PythonThread = o0PythonThread,
           u0ExceptionLineNumber = oCurrentTraceback.tb_lineno,
           u0ExceptionCharacterNumber = None,
         );
         fDebugOutputHelper(
-          oExceptionFrame.uThreadId, oExceptionFrame.sThreadName,
+          oExceptionFrame.u0ThreadId, oExceptionFrame.s0ThreadName,
           oExceptionFrame.sSourceFilePath, oExceptionFrame.u0ExceptionLineNumber,
           "%sraise %s; // [%s] duration = %fs" % (
             "" if oCurrentTraceback.tb_next is None else "re-",
@@ -197,7 +201,7 @@ def ShowDebugOutput(fxFunction):
         # it returned to. This will be indicated in the output (bIsReturnAddress = True).
         sReturnValue = fsToString(xReturnValue, guReturnValueAsStringMaxSize);
         fDebugOutputHelper(
-          oCallFrame.uThreadId, oCallFrame.sThreadName,
+          oCallFrame.u0ThreadId, oCallFrame.s0ThreadName,
           oCallFrame.sSourceFilePath, oCallFrame.uLastExecutedLineNumber,
           "return %s; // duration = %fs [%s] " % (sReturnValue, time.time() - nStartTime, sCallDescription),
           uIndentationChange = -1,

@@ -10,7 +10,7 @@ def fTerminateWithDeadlock(sMessage = None, aasConsoleOutputLines = None, uDeadl
   oPythonThread = threading.currentThread();
   sTitle = "Deadlock reported";
   doStack_by_uThreadId = dict([
-    (oStack.uThreadId, oStack)
+    (oStack.u0ThreadId, oStack)
     for oStack in cCallStack.faoForAllThreads(
       uCurrentThreadEndStackOffset = 1
     )

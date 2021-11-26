@@ -12,7 +12,7 @@ def fShowDebugOutput(sMessage):
     if fbIsDebugOutputEnabledForSourceFilePathAndClass(oActiveFrame.sSourceFilePath, oActiveFrame.cClass):
       
       fDebugOutputHelper(
-        oActiveFrame.uThreadId, oActiveFrame.sThreadName,
+        oActiveFrame.u0ThreadId, oActiveFrame.s0ThreadName,
         oActiveFrame.sSourceFilePath, oActiveFrame.uLastExecutedLineNumber,
         sMessage
       );

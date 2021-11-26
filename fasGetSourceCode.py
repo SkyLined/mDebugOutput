@@ -15,6 +15,8 @@ def fasGetSourceCode(sSourceFilePath):
         asRawLines = []; # Unable to read file -> no lines
       except UnicodeDecodeError as oException:
         continue;
+      except NameError:
+        asRawLines = []; # If Python is shutting down, "open" may no longer be defined -> no lines
       break;
     asModuleSourceCode = gdasSourceCode_by_sFilePath[sSourceFilePath] = [
       sLine.rstrip("\n").rstrip("\r")

@@ -4,7 +4,11 @@ def fConsoleOutputExceptionDetails(oException, o0Traceback = None, o0PythonThrea
   oTraceback = o0Traceback or sys.exc_info()[2];
   oStack = cCallStack.foFromTraceback(oTraceback, o0PythonThread);
   
-  sBoxTitle = "Fatal %s.%s Exception in thread 0x%X" % (oException.__class__.__module__, oException.__class__.__name__, oStack.uThreadId);
+  sBoxTitle = "Fatal %s.%s Exception in %s" % (
+    oException.__class__.__module__, oException.__class__.__name__,
+    "thread %d/0x%X (%s)" % (oStack.u0ThreadId, oStack.u0ThreadId, oStack.s0ThreadName or "<unnamed>")
+        if oStack.u0ThreadId is not None else "unknown thread"
+  );
   
   aasConsoleOutputLines = faasCreateConsoleOutputForException(oException, oTraceback, oStack);
   
@@ -22,7 +26,7 @@ def fConsoleOutputExceptionDetails(oException, o0Traceback = None, o0PythonThrea
   if bShowStacksForAllThread:
     oPythonThread = threading.currentThread();
     doStack_by_uThreadId = dict([
-      (oStack.uThreadId, oStack)
+      (oStack.u0ThreadId, oStack)
       for oStack in cCallStack.faoForAllThreads()
     ]);
     if len(doStack_by_uThreadId) != 1:
