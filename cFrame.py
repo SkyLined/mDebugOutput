@@ -24,6 +24,7 @@ class cFrame():
   
   @classmethod
   def foForCurrentThread(cClass, uEndIndex = 0):
+    mDebugOutput_HideInCallStack = 1; # This function should not show up on the stack.
     # Create a list of all PythonFrames on the stack in the current thread.
     oPythonFrame = inspect.currentframe();
     aoPythonFrames = [];
@@ -72,11 +73,13 @@ class cFrame():
   
   @classmethod
   def foForThisFunction(cClass):
+    mDebugOutput_HideInCallStack = 1; # This function should not show up on the stack.
     # A call to this function will be at the top of the stack, so we need to skip that to get to our caller.
     return cClass.foForCurrentThread();
   
   @classmethod
   def foForThisFunctionsCaller(cClass):
+    mDebugOutput_HideInCallStack = 1; # This function should not show up on the stack.
     # A call to this function will be at the top of the stack, so we need to skip that to get to our caller.
     return cClass.foForCurrentThread(uEndIndex = 1); 
   
