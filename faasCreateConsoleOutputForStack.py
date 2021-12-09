@@ -89,7 +89,10 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
       else:
         sException = "%s(%s)" % (oException.__class__.__name__, repr(oException.msg));
     elif isinstance(oException, AssertionError):
-      sException = "Assertion failed: %s" % oException.args[0];
+      if oException.args:
+        sException = "Assertion failed: %s" % ", ".join(repr(xArg) for xArg in oException.args);
+      else:
+        sException = "Assertion failed";
     elif hasattr(oException, "message"):
       sException = "%s(%s)" % (oException.__class__.__name__, ", ".join(repr(xArg) for xArg in oException.args));
     else:
