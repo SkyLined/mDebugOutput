@@ -69,7 +69,7 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
       aasConsoleOutputLines += faasCreateConsoleOutputForSourceCode(
         sSourceFilePath = oException.filename,
         uStartLineNumber = oException.lineno - 1,
-        uEndLineNumber = oException.lineno + 1,
+        uEndLineNumber = oException.end_lineno + 1,
         axOutputHeader = [guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ "],
         uLineNumberColor = guLineNumberColor,
         uInactiveCodeColor = guStackAtExceptionInactiveSourceCodeColor,
@@ -78,11 +78,19 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
       asModuleSourceCode = fasGetSourceCode(oException.filename);
       uEndLineNumberSize = len(str(min(oException.lineno + 2, len(asModuleSourceCode) + 1)));
       if oException.offset is not None:
+        # The below calculations will never give a negative result because `uEndLineNumberSize` is always larger than 1
+        # and `end_offset` is always larger than `offset`
         aasConsoleOutputLines += [
           [
-            guStackTreeColor, " ╷" * uCurrentFrameIndex, " │", 
-            # The below calculation will never give a negative result because uEndLineNumberSize is always larger than 1
-            guStackAtExceptionColumnIndicatorColor, " ╭", "─" * (uEndLineNumberSize + oException.offset - 1), "╯"
+            guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ ", 
+            guStackAtExceptionColumnIndicatorColor,
+              "╭",
+              "╴" * (uEndLineNumberSize + oException.offset - 1),
+              [
+                "┴",
+                "─"  * (oException.end_offset - oException.offset - 2)
+              ] if oException.lineno == oException.end_lineno and oException.offset != oException.end_offset - 1 else [],
+              "╯"
           ]
         ];
         sException = "%s(%s at character %d)" % (oException.__class__.__name__, repr(oException.msg), oException.offset);
