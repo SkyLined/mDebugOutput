@@ -30,7 +30,7 @@ class cCallStack():
     return cClass.foForCurrentThread();
   @classmethod
   def foForThisFunctionsCaller(cClass):
-    return cClass.foForCurrentThread(uEndIndex = 3);
+    return cClass.foForCurrentThread(uEndIndex = 2);
   @classmethod
   def foForCurrentThread(cClass, uStartIndex = None, uEndIndex = None):
     return cClass.foFromPythonFrameAndThread(inspect.currentframe(), threading.currentThread(), uStartIndex, uEndIndex);
