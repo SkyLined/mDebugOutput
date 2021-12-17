@@ -5,7 +5,6 @@ from .fdxExceptionDetailsForKeyError import fdxExceptionDetailsForKeyError;
 from .fdxExceptionDetailsForNameError import fdxExceptionDetailsForNameError;
 from .fdxExceptionDetailsForSyntaxError import fdxExceptionDetailsForSyntaxError;
 from .fdxExceptionDetailsForTypeError import fdxExceptionDetailsForTypeError;
-from .fdxExceptionDetailsForUnboundLocalError import fdxExceptionDetailsForUnboundLocalError;
 from .fdxExceptionDetailsForUnicodeDecodeError import fdxExceptionDetailsForUnicodeDecodeError;
 from .fdxExceptionDetailsForValueError import fdxExceptionDetailsForValueError;
 from .fdxExceptionDetailsForWindowsError import fdxExceptionDetailsForWindowsError;
@@ -38,8 +37,6 @@ def fdxExceptionDetails(oException, oTraceback):
     return fdxExceptionDetailsForSyntaxError(oException);
   elif isinstance(oException, TypeError):
     return fdxExceptionDetailsForTypeError(oException, oTraceback);
-  elif isinstance(oException, UnboundLocalError):
-    return fdxExceptionDetailsForUnboundLocalError(oException);
   elif isinstance(oException, UnicodeDecodeError):
     return fdxExceptionDetailsForUnicodeDecodeError(oException);
   elif isinstance(oException, ValueError):

@@ -1,18 +1,26 @@
 import re;
 
 def fdxExceptionDetailsForNameError(oException):
-  if len(oException.args) < 1:
+  if len(oException.args) != 1:
     return {};
-  sVariableName = oException.name;
-  # Old code used in Python 2 to get the name from the error message:
-  # oUnknownVariableErrorMessageMatch = re.match(r"^(?:global )?name '([_\w]+)' is not defined$", oException.args[0]);
-  # if not oUnknownVariableErrorMessageMatch:
-  #   return {};
-  # sVariableName = oUnknownVariableErrorMessageMatch.group(1);
+  if isinstance(oException, UnboundLocalError):
+    oUnboundLocalErrorMessageMatch = re.match(r"^local variable '([_\w]+)' referenced before assignment$", oException.args[0]);
+    if not oUnboundLocalErrorMessageMatch:
+      return {};
+    sVariableName = oUnboundLocalErrorMessageMatch.group(1);
+    sProblemDescription = "Uninitialised variable";
+  else:
+    oNameErrorMessageMatch = re.match(r"^(?:global )?name '([_\w]+)' is not defined$", oException.args[0]);
+    if not oNameErrorMessageMatch:
+      return {};
+    sVariableName = oNameErrorMessageMatch.group(1);
+    if sVariableName != oException.name:
+      return {}; # Sanity check.
+    sProblemDescription = "Undefined variable";
   return {
     "aasConsoleOutputLines": [
       [
-        guExceptionInformationColor, "Undefined variable ",
+        guExceptionInformationColor, sProblemDescription, " ",
         guExceptionInformationHighlightColor, sVariableName, 
         guExceptionInformationColor, ".",
       ],
