@@ -77,19 +77,27 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
       );
       asModuleSourceCode = fasGetSourceCode(oException.filename);
       uEndLineNumberSize = len(str(min(oException.lineno + 2, len(asModuleSourceCode) + 1)));
-      if oException.offset is not None:
-        # The below calculations will never give a negative result because `uEndLineNumberSize` is always larger than 1
-        # and `end_offset` is always larger than `offset`
+      if isinstance(oException, IndentationError):
+        # Doesn't handle tabs, only spaces... :(
+        sExceptionLine = asModuleSourceCode[oException.end_lineno - 1];
+        uStartIndex = len(sExceptionLine) - len(sExceptionLine.lstrip(" "));
+        uHighlightLength = 1;
+      elif oException.offset is not None:
+        uStartIndex = oException.offset - 1; 
+        uHighlightLength = oException.end_offset - oException.offset if oException.end_offset != -1 else 1;
+      else:
+        uHighlightLength = 0;
+      if uHighlightLength != 0:
         aasConsoleOutputLines += [
           [
             guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ ", 
             guStackAtExceptionColumnIndicatorColor,
               "╭",
-              "╴" * (uEndLineNumberSize + oException.offset - 1),
+              "╴" * (uEndLineNumberSize + uStartIndex),
               [
                 "┴",
-                "─"  * (oException.end_offset - oException.offset - 2)
-              ] if oException.lineno == oException.end_lineno and oException.offset != oException.end_offset - 1 else [],
+                "─"  * (uHighlightLength - 2) # 0 or greater because `uHighlightLength > 1` in following line
+              ] if oException.lineno == oException.end_lineno and uHighlightLength > 1 else [],
               "╯"
           ]
         ];
