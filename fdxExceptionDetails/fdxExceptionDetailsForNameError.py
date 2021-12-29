@@ -3,6 +3,10 @@ import re;
 def fdxExceptionDetailsForNameError(oException):
   if len(oException.args) != 1:
     return {};
+  dxHiddenProperties = {
+    "args": oException.args,
+    "with_traceback": oException.with_traceback,
+  };
   if isinstance(oException, UnboundLocalError):
     oUnboundLocalErrorMessageMatch = re.match(r"^local variable '([_\w]+)' referenced before assignment$", oException.args[0]);
     if not oUnboundLocalErrorMessageMatch:
@@ -14,8 +18,11 @@ def fdxExceptionDetailsForNameError(oException):
     if not oNameErrorMessageMatch:
       return {};
     sVariableName = oNameErrorMessageMatch.group(1);
-    if sVariableName != oException.name:
-      return {}; # Sanity check.
+    # Python behavior is inconsistent; the property "name" may or may not exist.
+    if hasattr(oException, "name"):
+      if sVariableName != oException.name:
+        return {}; # Sanity check.
+      dxHiddenProperties["name"] = oException.name;
     sProblemDescription = "Undefined variable";
   return {
     "aasConsoleOutputLines": [
@@ -25,11 +32,7 @@ def fdxExceptionDetailsForNameError(oException):
         guExceptionInformationColor, ".",
       ],
     ],
-    "dxHiddenProperties": {
-      "args": oException.args,
-      "name": oException.name,
-      "with_traceback": oException.with_traceback,
-    },
+    "dxHiddenProperties": dxHiddenProperties,
   };
 
 from ..mColorsAndChars import *;
