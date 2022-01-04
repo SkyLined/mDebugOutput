@@ -1,12 +1,12 @@
-import re;
+﻿import re;
 
-def fdxExceptionDetailsForNameError(oException):
+def fdxExceptionDetailsForUnboundLocalError(oException):
   if len(oException.args) != 1:
     return {};
-  oNameErrorMessageMatch = re.match(r"^(?:global )?name '([_\w]+)' is not defined$", oException.args[0]);
-  if not oNameErrorMessageMatch:
+  oUnboundLocalErrorMessageMatch = re.match(r"^local variable '([_\w]+)' referenced before assignment$", oException.args[0]);
+  if not oUnboundLocalErrorMessageMatch:
     return {};
-  sVariableName = oNameErrorMessageMatch.group(1);
+  sVariableName = oUnboundLocalErrorMessageMatch.group(1);
   # Python behavior is inconsistent; the property "name" may or may not exist.
   # In addition it may be None even if the name of the variable is known.
   dxHiddenProperties = {
@@ -18,7 +18,7 @@ def fdxExceptionDetailsForNameError(oException):
   return {
     "aasConsoleOutputLines": [
       [
-        guExceptionInformationColor, "Undefined variable ",
+        guExceptionInformationColor, "Uninitialised variable ",
         guExceptionInformationHighlightColor, sVariableName, 
         guExceptionInformationColor, ".",
       ],

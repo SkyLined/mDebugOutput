@@ -7,16 +7,24 @@ def faasCreateConsoleOutputForException(oException, oTraceback, oStack):
   bShowLocals = dxExceptionDetails.get("bShowLocals", True);
   
   if a0asConsoleOutputLines is None:
+    dsAttributes = {};
+    for sName in dir(oException):
+      if sName[0] != "_":
+        try:
+          xAttribute = getattr(oException, sName);
+        except:
+          dsAttributes[sName] = "<inaccessible>";
+        else:
+          dsAttributes[sName] = fsToString(xAttribute);
     aasConsoleOutputLines = [
       [guExceptionInformationColor, "Exception attributes:"],
     ] + [
       [
-        guExceptionInformationHighlightColor, str(sName),
+        guExceptionInformationHighlightColor, sName,
         guExceptionInformationColor, " = ", 
-        guExceptionInformationHighlightColor, fsToString(getattr(oException, sName))
+        guExceptionInformationHighlightColor, sValue
       ]
-      for sName in dir(oException)
-      if sName[0] != "_"
+      for (sName, sValue) in dsAttributes.items()
     ];
   else:
     aasConsoleOutputLines = a0asConsoleOutputLines;

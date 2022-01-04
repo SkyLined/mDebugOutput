@@ -2,18 +2,22 @@ from .fdxExceptionDetailsForAssertionError import fdxExceptionDetailsForAssertio
 from .fdxExceptionDetailsForAttributeError import fdxExceptionDetailsForAttributeError;
 from .fdxExceptionDetailsForImportError import fdxExceptionDetailsForImportError;
 from .fdxExceptionDetailsForKeyError import fdxExceptionDetailsForKeyError;
+from .fdxExceptionDetailsForModuleNotFoundError import fdxExceptionDetailsForModuleNotFoundError;
 from .fdxExceptionDetailsForNameError import fdxExceptionDetailsForNameError;
 from .fdxExceptionDetailsForSyntaxError import fdxExceptionDetailsForSyntaxError;
 from .fdxExceptionDetailsForTypeError import fdxExceptionDetailsForTypeError;
+from .fdxExceptionDetailsForUnboundLocalError import fdxExceptionDetailsForUnboundLocalError;
 from .fdxExceptionDetailsForUnicodeDecodeError import fdxExceptionDetailsForUnicodeDecodeError;
+from .fdxExceptionDetailsForUnicodeEncodeError import fdxExceptionDetailsForUnicodeEncodeError;
 from .fdxExceptionDetailsForValueError import fdxExceptionDetailsForValueError;
 from .fdxExceptionDetailsForWindowsError import fdxExceptionDetailsForWindowsError;
 # Optional
 try: 
-  import json as m0json;
-except:
-  m0json = None;
+  from json.decoder import JSONDecodeError as JSONDecodeError;
+except Ec:
+  bJSONSupportEnabled = False;
 else:
+  bJSONSupportEnabled = True;
   from .fdxExceptionDetailsForJSONDecodeError import fdxExceptionDetailsForJSONDecodeError;
 try:
   import mWindowsSDK as m0WindowsSDK;
@@ -28,23 +32,32 @@ def fdxExceptionDetails(oException, oTraceback):
   elif isinstance(oException, AttributeError):
     return fdxExceptionDetailsForAttributeError(oException);
   elif isinstance(oException, ImportError):
-    return fdxExceptionDetailsForImportError(oException);
+    if isinstance(oException, ModuleNotFoundError):
+      return fdxExceptionDetailsForModuleNotFoundError(oException);
+    else:
+      return fdxExceptionDetailsForImportError(oException);
   elif isinstance(oException, KeyError):
     return fdxExceptionDetailsForKeyError(oException);
   elif isinstance(oException, NameError):
-    return fdxExceptionDetailsForNameError(oException);
+    if isinstance(oException, UnboundLocalError):
+      return fdxExceptionDetailsForUnboundLocalError(oException);
+    else:
+      return fdxExceptionDetailsForNameError(oException);
   elif isinstance(oException, SyntaxError):
     return fdxExceptionDetailsForSyntaxError(oException);
   elif isinstance(oException, TypeError):
     return fdxExceptionDetailsForTypeError(oException, oTraceback);
   elif isinstance(oException, UnicodeDecodeError):
     return fdxExceptionDetailsForUnicodeDecodeError(oException);
+  elif isinstance(oException, UnicodeEncodeError):
+    return fdxExceptionDetailsForUnicodeEncodeError(oException);
   elif isinstance(oException, ValueError):
-    return fdxExceptionDetailsForValueError(oException);
+    if bJSONSupportEnabled and isinstance(oException, JSONDecodeError):
+      return fdxExceptionDetailsForJSONDecodeError(oException);
+    else:
+      return fdxExceptionDetailsForValueError(oException);
   elif isinstance(oException, WindowsError):
     return fdxExceptionDetailsForWindowsError(oException);
-  elif m0json and isinstance(oException, m0json.decoder.JSONDecodeError):
-    return fdxExceptionDetailsForJSONDecodeError(oException);
   elif m0WindowsSDK and isinstance(oException, m0WindowsSDK.cDLL.cInvalidFunctionArgumentsException):
     return fdxExceptionDetailsFor_mWindowsSDK_cDLL_cInvalidFunctionArgumentsException(oException);
   else:

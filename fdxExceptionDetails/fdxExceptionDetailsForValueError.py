@@ -13,7 +13,19 @@ def fdxExceptionDetailsForValueError(oException):
       ],
     ];
   else:
-    return {};
+    oTooFewValuesInTupleMatch = re.match(r"^not enough values to unpack \(expected (\d+), got (\d+)\)$", oException.args[0]);
+    if oTooFewValuesInTupleMatch:
+      aasConsoleOutputLines = [
+        [
+          guExceptionInformationColor, "Expected ",
+          guExceptionInformationHighlightColor, oTooFewValuesInTupleMatch.group(1), 
+          guExceptionInformationColor, " values in tuple but got only ",
+          guExceptionInformationHighlightColor, oTooFewValuesInTupleMatch.group(2), 
+          guExceptionInformationColor, ".",
+        ],
+      ];
+    else:
+      return {};
   return {
     "aasConsoleOutputLines": aasConsoleOutputLines,
     "dxHiddenProperties": {

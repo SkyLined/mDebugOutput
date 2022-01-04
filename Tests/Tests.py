@@ -5,5 +5,6 @@ sys.path = [sModulePath] + [sPath for sPath in sys.path if sPath.lower() != sMod
 from fTestDependencies import fTestDependencies;
 fTestDependencies();
 
-# I should add some tests here.
-pass;
+# I should add some more tests here.
+from fTestExceptionMessages import fTestExceptionMessages;
+fTestExceptionMessages();

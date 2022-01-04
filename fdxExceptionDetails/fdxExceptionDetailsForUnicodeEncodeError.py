@@ -1,10 +1,10 @@
-def fdxExceptionDetailsForUnicodeDecodeError(oException):
+def fdxExceptionDetailsForUnicodeEncodeError(oException):
   sInputString = oException.object;
   sOffensiveChars = sInputString[oException.start: oException.end];
   bInputIsUnicode = isinstance(sInputString, str);
   aasConsoleOutputLines = [
     [
-      guExceptionInformationColor, "Cannot decode characters in string at offset ",
+      guExceptionInformationColor, "Cannot encode characters in string at offset ",
       guExceptionInformationHighlightColor, str(oException.start),
       guExceptionInformationColor, " because ",
       guExceptionInformationHighlightColor, fsToString(oException.reason),
