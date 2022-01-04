@@ -4,9 +4,8 @@ def fdxExceptionDetailsForAssertionError(oException):
     return {};
   return {
     "aasConsoleOutputLines": [
-      [
-        guExceptionInformationHighlightColor, oException.args[0],
-      ],
+      [ guExceptionInformationHighlightColor, sLine.rstrip("\r") ]
+      for sLine in oException.args[0].split("\n")
     ],
     "dxHiddenProperties": {
       "args": oException.args,
