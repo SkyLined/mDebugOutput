@@ -1,11 +1,9 @@
 try:
-  from mWindowsSDK import *;
+  from mWindowsSDK import fs0GetWin32ErrorCodeDefineName as f0s0GetWin32ErrorCodeDefineName;
 except ModuleNotFoundError as oException:
   if oException.args[0] != "No module named 'mWindowsSDK'":
     raise;
-  bWindowsSDKAvailable = False;
-else:
-  bWindowsSDKAvailable = True;
+  f0s0GetWin32ErrorCodeDefineName = None;
 
 def fdxExceptionDetailsForWindowsError(oException):
   u0Win32ErrorNumber = oException.errno;
@@ -19,13 +17,16 @@ def fdxExceptionDetailsForWindowsError(oException):
   if u0Win32ErrorNumber is not None:
     if u0Win32ErrorNumber > 10:
       asWin32ErrorDescriptionConsoleOutputLines += [
-        guExceptionInformationColor, " / ", guExceptionInformationHighlightColor, "0x%X" % u0Win32ErrorNumber, 
+        guExceptionInformationColor, " / ",
+        guExceptionInformationHighlightColor, "0x%X" % u0Win32ErrorNumber, 
       ];
-    if bWindowsSDKAvailable:
-      s0Win32ErrorDefineName = fs0GetWin32ErrorCodeDefineName(u0Win32ErrorNumber);
+    if f0s0GetWin32ErrorCodeDefineName:
+      s0Win32ErrorDefineName = f0s0GetWin32ErrorCodeDefineName(u0Win32ErrorNumber);
       if s0Win32ErrorDefineName:
         asWin32ErrorDescriptionConsoleOutputLines += [
-          guExceptionInformationColor, " (", guExceptionInformationHighlightColor, s0Win32ErrorDefineName, guExceptionInformationColor, ")",
+          guExceptionInformationColor, " (",
+          guExceptionInformationHighlightColor, s0Win32ErrorDefineName,
+          guExceptionInformationColor, ")",
         ];
   aasConsoleOutputLines.append([
     guExceptionInformationColor, "Error description: \"",
