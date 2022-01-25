@@ -23,65 +23,74 @@ class cFrame():
     );
   
   @classmethod
-  def foForCurrentThread(cClass, uEndIndex = 0):
+  def fo0ForCurrentThreadAndFunction(cClass):
+    mDebugOutput_HideInCallStack = 1; # This function should not show up on the stack.
+    return cClass.__fo0ForCurrentThread(False);
+  @classmethod
+  def fo0ForCurrentThreadAndFunctionCaller(cClass):
+    mDebugOutput_HideInCallStack = 1; # This function should not show up on the stack.
+    return cClass.__fo0ForCurrentThread(True);
+  @classmethod
+  def __fo0ForCurrentThread(cClass, bReturnCallerFrame):
     mDebugOutput_HideInCallStack = 1; # This function should not show up on the stack.
     # Create a list of all PythonFrames on the stack in the current thread.
     oPythonFrame = inspect.currentframe();
     aoPythonFrames = [];
     # We are ignoring frames with hidden functions in our indices, so we need to
     # take that into account when determining the end index for this first frame:
-    oWantedPythonFrame = None;
-    uCurrentEndIndex = 0;
+    o0WantedPythonFrame = None;
+    bCurrentFunctionFrameFound = False;
     while oPythonFrame:
       aoPythonFrames.insert(0, oPythonFrame);
+      # This function ignores hidden frames.
       if "mDebugOutput_HideInCallStack" not in oPythonFrame.f_code.co_varnames:
-        if uEndIndex == uCurrentEndIndex:
-          if oWantedPythonFrame is None:
-            oWantedPythonFrame = oPythonFrame;
-            if not gbDebugDumpRawStacksAndTracebacks:
-              break;
-        uCurrentEndIndex += 1;
+        # If we haven't found the frame we want yet, and:
+        # * if we want the function's frame and we haven't found it yet
+        # * or if we want the function's caller frame and we have previously
+        #   found the function's fram.
+        # ... then this is the frame we want.
+        if (
+          o0WantedPythonFrame is None
+        ) and (
+          (
+            not bReturnCallerFrame and not bCurrentFunctionFrameFound
+          ) or (
+            bReturnCallerFrame and bCurrentFunctionFrameFound
+          )
+        ):
+          o0WantedPythonFrame = oPythonFrame;
+          if not gbDebugDumpRawStacksAndTracebacks:
+            break;
+        bCurrentFunctionFrameFound = True;
       oPythonFrame = oPythonFrame.f_back;
-    assert oWantedPythonFrame, \
-        "Cannot find end stack frame %d" % uEndIndex;
     if gbDebugDumpRawStacksAndTracebacks:
-      print("--[ cCallStack.cFrame.foForCurrentThread ]".ljust(80, "-"));
+      print((
+        "--[ cCallStack.cFrame.fo0ForCurrentThreadAndFunction%s ]" % ("Caller" if bReturnCallerFrame else "")
+      ).ljust(80, "-"));
       uIndex = 0;
       for oPythonFrame in aoPythonFrames:
         if "mDebugOutput_HideInCallStack" in oPythonFrame.f_code.co_varnames:
           fDumpPythonFrame(oPythonFrame, "  - ", "Hidden code");
         else:
           uCurrentEndIndex -= 1;
-          if oPythonFrame == oWantedPythonFrame:
-            assert uCurrentEndIndex == uEndIndex, \
-                "uCurrentEndIndex (%d) != uEndIndex (%d)!" % (uCurrentEndIndex, uEndIndex);
-            fDumpPythonFrame(oPythonFrame, "%2d+ " % uIndex, "uEndIndex = %d" % uCurrentEndIndex);
+          if oPythonFrame == o0WantedPythonFrame:
+            fDumpPythonFrame(oPythonFrame, "%2d+ " % uIndex, "Wanted frame");
           else:
-            fDumpPythonFrame(oPythonFrame, "  - ", "uEndIndex = %s" % uCurrentEndIndex);
+            fDumpPythonFrame(oPythonFrame, "  - ", "");
           uIndex += 1;
       print("-" * 80);
+    if not o0WantedPythonFrame:
+      return None; # All frames are hidden.
     try: # This can fail during shutdown, so we catch any exceptions and ignore them.
       o0PythonThread = threading.currentThread();
     except:
       o0PythonThread = None;
     return cClass.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(
-      oPythonFrame = oWantedPythonFrame,
+      oPythonFrame = o0WantedPythonFrame,
       o0PythonThread = o0PythonThread,
       u0ExceptionLineNumber = None,
       u0ExceptionCharacterNumber = None,
     );
-  
-  @classmethod
-  def foForThisFunction(cClass):
-    mDebugOutput_HideInCallStack = 1; # This function should not show up on the stack.
-    # A call to this function will be at the top of the stack, so we need to skip that to get to our caller.
-    return cClass.foForCurrentThread();
-  
-  @classmethod
-  def foForThisFunctionsCaller(cClass):
-    mDebugOutput_HideInCallStack = 1; # This function should not show up on the stack.
-    # A call to this function will be at the top of the stack, so we need to skip that to get to our caller.
-    return cClass.foForCurrentThread(uEndIndex = 1); 
   
   def __init__(
     oSelf,

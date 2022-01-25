@@ -117,7 +117,9 @@ def ShowDebugOutput(fxFunction):
       if sdxArgumentName:
         asCallArguments.append("**%s = %s" % (sdxArgumentName, fsToString(dxCallArgument, guArgumentAsStringMaxSize)));
       sCallArguments = ", ".join(asCallArguments);
-      oCallFrame = cFrame.foForThisFunction();
+      # This function is hidden, so if we ask for the the frame for this function, we will get
+      # the frame of its caller.
+      oCallFrame = cFrame.fo0ForCurrentThreadAndFunction();
       if gbShowInternalDebugOutput:
         if not bShowDebugOutput:
           print("@ HIDE %s(%s) @ %s" % (sCallDescription, sCallArguments, repr(sSourceFilePath)));

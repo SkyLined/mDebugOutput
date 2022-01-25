@@ -21,10 +21,14 @@ class cCallStack():
         o0PythonThread = threading.currentThread();
       except:
         pass;
-    return cClass([
-      cFrame.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(oPythonFrame, o0PythonThread, u0ExceptionLineNumber, None)
-      for (oPythonFrame, u0ExceptionLineNumber, u0ExceptionCharacterNumber) in atxPythonFramesAndExceptionLineAndCharacterNumbers
-    ]);
+    return cClass(
+      [
+        cFrame.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(oPythonFrame, o0PythonThread, u0ExceptionLineNumber, None)
+        for (oPythonFrame, u0ExceptionLineNumber, u0ExceptionCharacterNumber) in atxPythonFramesAndExceptionLineAndCharacterNumbers
+      ],
+      o0PythonThread.ident if o0PythonThread else None,
+      o0PythonThread.name if o0PythonThread else None,
+    );
   @classmethod
   def foForThisFunction(cClass):
     return cClass.foForCurrentThread();
@@ -74,7 +78,10 @@ class cCallStack():
         uCurrentEndIndex -= 1;
     if gbDebugDumpRawStacksAndTracebacks:
       print("-" * 80);
-    return cClass.__foFromPythonFramesAndExceptionLineAndCharacterNumbers(atxPythonFramesAndExceptionLineAndCharacterNumbers, o0PythonThread);
+    return cClass.__foFromPythonFramesAndExceptionLineAndCharacterNumbers(
+      atxPythonFramesAndExceptionLineAndCharacterNumbers,
+      o0PythonThread,
+    );
   
   @classmethod
   def faoForAllThreads(cClass, uCurrentThreadEndIndex = 0):
@@ -113,13 +120,19 @@ class cCallStack():
       oTraceback = oTraceback.tb_next;
     if gbDebugDumpRawStacksAndTracebacks:
       print("-" * 80);
-    oStack = cClass.__foFromPythonFramesAndExceptionLineAndCharacterNumbers(atxPythonFramesAndExceptionLineAndCharacterNumbers, o0PythonThread);
+    oStack = cClass.__foFromPythonFramesAndExceptionLineAndCharacterNumbers(
+      atxPythonFramesAndExceptionLineAndCharacterNumbers,
+      o0PythonThread,
+    );
     return oStack;
   
-  def __init__(oSelf, aoFrames):
-    assert len(aoFrames) > 0, \
-        "A stack must have at least one frame!";
+  def __init__(oSelf, aoFrames, u0ThreadId, s0ThreadName):
+# Since frames can be hidden, there may be 0 in the stack
+#    assert len(aoFrames) > 0, \
+#        "A stack must have at least one frame!";
     oSelf.aoFrames = aoFrames; # frame 0 is the top frame.
+    oSelf.u0ThreadId = u0ThreadId;
+    oSelf.s0ThreadName = s0ThreadName;
     
     for uIndex in range(len(oSelf.aoFrames)):
       oFrame = oSelf.aoFrames[uIndex];
@@ -129,16 +142,8 @@ class cCallStack():
       oFrame.oChildFrame = oSelf.aoFrames[uIndex + 1] if uIndex < len(oSelf.aoFrames) - 1 else None;
   
   @property
-  def u0ThreadId(oSelf):
-    return oSelf.aoFrames[0].u0ThreadId;
-  
-  @property
-  def s0ThreadName(oSelf):
-    return oSelf.aoFrames[0].s0ThreadName;
-  
-  @property
-  def oTopFrame(oSelf):
-    return oSelf.aoFrames[-1];
+  def o0TopFrame(oSelf):
+    return oSelf.aoFrames[-1] if oSelf.aoFrames else None;
   
   def faasCreateConsoleOutput(oSelf, *txArguments, **dxArguments):
     return faasCreateConsoleOutputForStack(oSelf, *txArguments, **dxArguments);

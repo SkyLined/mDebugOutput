@@ -61,13 +61,16 @@ def faasCreateConsoleOutputForException(oException, oTraceback, oStack):
       [],
       [guExceptionInformationColor, "Local variables:"],
     ]
-    asLocalVariableNames = sorted(list(oStack.oTopFrame.dxLocalVariables.keys()), key = str.lower);
+    if oStack.o0TopFrame:
+      asLocalVariableNames = sorted(list(oStack.o0TopFrame.dxLocalVariables.keys()), key = str.lower);
+    else:
+      asLocalVariableNames = [];
     if len(asLocalVariableNames) > guMaxNumberOfLocalVariablesToShow:
       # Try to filter out constants by removing all variables whose names is IN_ALL_CAPS:
       asLocalVariableNames = [sLocalVariableName for sLocalVariableName in asLocalVariableNames if sLocalVariableName.upper() != sLocalVariableName];
     bTooManyLocalVariables = len(asLocalVariableNames) > guMaxNumberOfLocalVariablesToShow;
     for sName in asLocalVariableNames[:guMaxNumberOfLocalVariablesToShow]:
-      xValue = oStack.oTopFrame.dxLocalVariables[sName];
+      xValue = oStack.o0TopFrame.dxLocalVariables[sName]; # This code is only execute if o0TopFrame is not None
       aasConsoleOutputLines += [
         ["  ", guExceptionInformationHighlightColor, sName, guExceptionInformationColor, " = ", fsToString(xValue)],
       ];

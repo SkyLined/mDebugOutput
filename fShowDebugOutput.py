@@ -7,13 +7,13 @@ guExitCodeInternalError = 1; # This is the common default I use. There's current
 
 def fShowDebugOutput(sMessage):
   try:
-    oActiveFrame = cFrame.foForThisFunctionsCaller();
-#    print "@@ %s" % (oActiveFrame.fsToString(),);
-    if fbIsDebugOutputEnabledForSourceFilePathAndClass(oActiveFrame.sSourceFilePath, oActiveFrame.cClass):
-      
+    o0ActiveFrame = cFrame.fo0ForCurrentThreadAndFunctionCaller();
+    assert o0ActiveFrame, \
+        "You cannot use fDebugOutput if all functions on the stack are hidden!";
+    if fbIsDebugOutputEnabledForSourceFilePathAndClass(o0ActiveFrame.sSourceFilePath, o0ActiveFrame.cClass):
       fDebugOutputHelper(
-        oActiveFrame.u0ThreadId, oActiveFrame.s0ThreadName,
-        oActiveFrame.sSourceFilePath, oActiveFrame.uLastExecutedLineNumber,
+        o0ActiveFrame.u0ThreadId, o0ActiveFrame.s0ThreadName,
+        o0ActiveFrame.sSourceFilePath, o0ActiveFrame.uLastExecutedLineNumber,
         sMessage
       );
   except Exception as oException:

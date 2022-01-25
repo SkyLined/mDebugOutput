@@ -49,61 +49,62 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
       uInactiveCodeColor = guStackAtExceptionInactiveSourceCodeColor if bIsExceptionFrame else guStackNormalInactiveSourceCodeColor,
       uActiveCodeColor = guStackAtExceptionActiveSourceCodeColor if bIsExceptionFrame else guStackNormalActiveSourceCodeColor,
     );
-  uCurrentFrameIndex = oStack.aoFrames[-1].uIndex;
+  uCurrentFrameIndex = oStack.aoFrames[-1].uIndex if oStack.aoFrames else -1;
   uNextFrameIndex = auExceptionReraisingFrameIndices.pop() if auExceptionReraisingFrameIndices else -1;
   if oException:
     if bIsSyntaxError:
-      # Source file name and line number where syntax error was found
-      uCurrentFrameIndex += 1;
-      aasConsoleOutputLines += [
-        [
-          guStackTreeColor, " ╷" * (uCurrentFrameIndex - 1), " ├" if uCurrentFrameIndex > 0 else "", "─┐ ",
-          guStackAtExceptionCallDescriptionColor, "<module>",
-          guStackAtExceptionCallDescriptionAndLocationJoinerColor, " @ ",
-          guStackAtExceptionSourceFilePathColor, str(oException.filename), "/", str(oException.lineno),
-        ] + (
-          ["/", str(oException.offset)] if oException.offset is not None else []
-        )
-      ];
-      # Source code where syntax error was found
-      aasConsoleOutputLines += faasCreateConsoleOutputForSourceCode(
-        sSourceFilePath = oException.filename,
-        uStartLineNumber = oException.lineno - 1,
-        uEndLineNumber = oException.end_lineno + 1,
-        axOutputHeader = [guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ "],
-        uLineNumberColor = guLineNumberColor,
-        uInactiveCodeColor = guStackAtExceptionInactiveSourceCodeColor,
-        uActiveCodeColor = guStackAtExceptionActiveSourceCodeColor,
-      );
-      asModuleSourceCode = fasGetSourceCode(oException.filename);
-      uEndLineNumberSize = len(str(min(oException.lineno + 2, len(asModuleSourceCode) + 1)));
-      if isinstance(oException, IndentationError):
-        # Doesn't handle tabs, only spaces... :(
-        sExceptionLine = asModuleSourceCode[oException.end_lineno - 1];
-        uStartIndex = len(sExceptionLine) - len(sExceptionLine.lstrip(" "));
-        uHighlightLength = 1;
-      elif oException.offset is not None:
-        uStartIndex = oException.offset - 1; 
-        uHighlightLength = oException.end_offset - oException.offset if oException.end_offset != -1 else 1;
-      else:
-        uHighlightLength = 0;
-      if uHighlightLength != 0:
+      if uCurrentFrameIndex != -1:
+        # Source file name and line number where syntax error was found
+        uCurrentFrameIndex += 1;
         aasConsoleOutputLines += [
           [
-            guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ ", 
-            guStackAtExceptionColumnIndicatorColor,
-              "╭",
-              "╴" * (uEndLineNumberSize + uStartIndex),
-              [
-                "┴",
-                "─"  * (uHighlightLength - 2) # 0 or greater because `uHighlightLength > 1` in following line
-              ] if oException.lineno == oException.end_lineno and uHighlightLength > 1 else [],
-              "╯"
-          ]
+            guStackTreeColor, " ╷" * (uCurrentFrameIndex - 1), " ├" if uCurrentFrameIndex > 0 else "", "─┐ ",
+            guStackAtExceptionCallDescriptionColor, "<module>",
+            guStackAtExceptionCallDescriptionAndLocationJoinerColor, " @ ",
+            guStackAtExceptionSourceFilePathColor, str(oException.filename), "/", str(oException.lineno),
+          ] + (
+            ["/", str(oException.offset)] if oException.offset is not None else []
+          )
         ];
-        sException = "%s(%s at character %d)" % (oException.__class__.__name__, repr(oException.msg), oException.offset);
-      else:
-        sException = "%s(%s)" % (oException.__class__.__name__, repr(oException.msg));
+        # Source code where syntax error was found
+        aasConsoleOutputLines += faasCreateConsoleOutputForSourceCode(
+          sSourceFilePath = oException.filename,
+          uStartLineNumber = oException.lineno - 1,
+          uEndLineNumber = oException.end_lineno + 1,
+          axOutputHeader = [guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ "],
+          uLineNumberColor = guLineNumberColor,
+          uInactiveCodeColor = guStackAtExceptionInactiveSourceCodeColor,
+          uActiveCodeColor = guStackAtExceptionActiveSourceCodeColor,
+        );
+        asModuleSourceCode = fasGetSourceCode(oException.filename);
+        uEndLineNumberSize = len(str(min(oException.lineno + 2, len(asModuleSourceCode) + 1)));
+        if isinstance(oException, IndentationError):
+          # Doesn't handle tabs, only spaces... :(
+          sExceptionLine = asModuleSourceCode[oException.end_lineno - 1];
+          uStartIndex = len(sExceptionLine) - len(sExceptionLine.lstrip(" "));
+          uHighlightLength = 1;
+        elif oException.offset is not None:
+          uStartIndex = oException.offset - 1; 
+          uHighlightLength = oException.end_offset - oException.offset if oException.end_offset != -1 else 1;
+        else:
+          uHighlightLength = 0;
+        if uHighlightLength != 0:
+          aasConsoleOutputLines += [
+            [
+              guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ ", 
+              guStackAtExceptionColumnIndicatorColor,
+                "╭",
+                "╴" * (uEndLineNumberSize + uStartIndex),
+                [
+                  "┴",
+                  "─"  * (uHighlightLength - 2) # 0 or greater because `uHighlightLength > 1` in following line
+                ] if oException.lineno == oException.end_lineno and uHighlightLength > 1 else [],
+                "╯"
+            ]
+          ];
+          sException = "%s(%s at character %d)" % (oException.__class__.__name__, repr(oException.msg), oException.offset);
+        else:
+          sException = "%s(%s)" % (oException.__class__.__name__, repr(oException.msg));
     elif isinstance(oException, AssertionError):
       if oException.args:
         sException = "Assertion failed: %s" % ", ".join(repr(xArg) for xArg in oException.args);
