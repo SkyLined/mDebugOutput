@@ -67,41 +67,111 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
           )
         ];
         # Source code where syntax error was found
-        aasConsoleOutputLines += faasCreateConsoleOutputForSourceCode(
-          sSourceFilePath = oException.filename,
-          uStartLineNumber = oException.lineno - 1,
-          uEndLineNumber = oException.end_lineno + 1,
-          axOutputHeader = [guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ "],
-          uLineNumberColor = guLineNumberColor,
-          uInactiveCodeColor = guStackAtExceptionInactiveSourceCodeColor,
-          uActiveCodeColor = guStackAtExceptionActiveSourceCodeColor,
-        );
         asModuleSourceCode = fasGetSourceCode(oException.filename);
         uEndLineNumberSize = len(str(min(oException.lineno + 2, len(asModuleSourceCode) + 1)));
-        if isinstance(oException, IndentationError):
-          # Doesn't handle tabs, only spaces... :(
-          sExceptionLine = asModuleSourceCode[oException.end_lineno - 1];
-          uStartIndex = len(sExceptionLine) - len(sExceptionLine.lstrip(" "));
-          uHighlightLength = 1;
-        elif oException.offset is not None:
-          uStartIndex = oException.offset - 1; 
-          uHighlightLength = oException.end_offset - oException.offset if oException.end_offset != -1 else 1;
-        else:
-          uHighlightLength = 0;
-        if uHighlightLength != 0:
+        sExceptionLine = asModuleSourceCode[oException.lineno - 1];
+        bEndOffsetIsValid = (
+          oException.lineno != oException.end_lineno or
+          oException.end_offset > oException.offset
+        );
+        uStartIndex = min(oException.offset, oException.end_offset) if bEndOffsetIsValid else oException.offset;
+        if oException.lineno != oException.end_lineno:
+          aasConsoleOutputLines += faasCreateConsoleOutputForSourceCode(
+            sSourceFilePath = oException.filename,
+            uStartLineNumber = oException.lineno - 1,
+            uEndLineNumber = oException.lineno + 1,
+            axOutputHeader = [guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ ", "  "],
+            uLineNumberColor = guLineNumberColor,
+            uInactiveCodeColor = guStackAtExceptionInactiveSourceCodeColor,
+            uActiveCodeColor = guStackAtExceptionActiveSourceCodeColor,
+          );
+        if oException.lineno == oException.end_lineno - 1:
+          bTopFirst = oException.offset < oException.end_offset;
+          uHighlightLength = abs(oException.offset - oException.end_offset);
           aasConsoleOutputLines += [
             [
               guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ ", 
               guStackAtExceptionColumnIndicatorColor,
                 "╭",
-                "╴" * (uEndLineNumberSize + uStartIndex),
+                "╴" * (uEndLineNumberSize + uStartIndex + 1),
                 [
-                  "┴",
-                  "─"  * (uHighlightLength - 2) # 0 or greater because `uHighlightLength > 1` in following line
+                  "┘" if bTopFirst else "┐",
+                  "╴"  * (uHighlightLength - 1), # 0 or greater because `uHighlightLength > 1` in following line
+                  "╮" if bTopFirst else "╯",
+                ] if uHighlightLength > 0 else [
+                  "┤"
+                ],
+            ]
+          ];
+        if oException.lineno < oException.end_lineno - 1:
+          aasConsoleOutputLines += [
+            [
+              guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ ", 
+              guStackAtExceptionColumnIndicatorColor,
+                "╭",
+                "╴" * (uEndLineNumberSize + oException.offset + 1),
+                "╯",
+            ]
+          ];
+          aasConsoleOutputLines += faasCreateConsoleOutputForSourceCode(
+            sSourceFilePath = oException.filename,
+            uStartLineNumber = oException.lineno + 1,
+            uEndLineNumber = oException.end_lineno,
+            axOutputHeader = [
+              guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ ",
+              guStackAtExceptionColumnIndicatorColor, "╷ "
+            ],
+            uLineNumberColor = guLineNumberColor,
+            uInactiveCodeColor = guStackAtExceptionInactiveSourceCodeColor,
+            uActiveCodeColor = guStackAtExceptionInactiveSourceCodeColor,
+          );
+          aasConsoleOutputLines += [
+            [
+              guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ ", 
+              guStackAtExceptionColumnIndicatorColor,
+                "┌",
+                "╴" * (uEndLineNumberSize + uStartIndex + 1),
+                "╮",
+            ]
+          ];
+        if oException.lineno < oException.end_lineno:
+          aasConsoleOutputLines += faasCreateConsoleOutputForSourceCode(
+            sSourceFilePath = oException.filename,
+            uStartLineNumber = oException.end_lineno,
+            uEndLineNumber = oException.end_lineno + 1,
+            axOutputHeader = [
+              guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ ",
+              guStackAtExceptionColumnIndicatorColor, "╷ "
+            ],
+            uLineNumberColor = guLineNumberColor,
+            uInactiveCodeColor = guStackAtExceptionInactiveSourceCodeColor,
+            uActiveCodeColor = guStackAtExceptionActiveSourceCodeColor,
+          );
+        else:
+          aasConsoleOutputLines += faasCreateConsoleOutputForSourceCode(
+            sSourceFilePath = oException.filename,
+            uStartLineNumber = oException.lineno - 1,
+            uEndLineNumber = oException.end_lineno + 1,
+            axOutputHeader = [guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ "],
+            uLineNumberColor = guLineNumberColor,
+            uInactiveCodeColor = guStackAtExceptionInactiveSourceCodeColor,
+            uActiveCodeColor = guStackAtExceptionActiveSourceCodeColor,
+          );
+          uHighlightLength = oException.end_offset - oException.offset if bEndOffsetIsValid else 1;
+          aasConsoleOutputLines += [
+            [
+              guStackTreeColor, " ╷" * uCurrentFrameIndex, " │ ", 
+              guStackAtExceptionColumnIndicatorColor,
+                "╭",
+                "╴" * (uEndLineNumberSize + uStartIndex - 1),
+                [
+                  "┘",
+                  "╴"  * (uHighlightLength - 1) # 0 or greater because `uHighlightLength > 1` in following line
                 ] if oException.lineno == oException.end_lineno and uHighlightLength > 1 else [],
                 "╯"
             ]
           ];
+        if oException.offset:
           sException = "%s(%s at character %d)" % (oException.__class__.__name__, repr(oException.msg), oException.offset);
         else:
           sException = "%s(%s)" % (oException.__class__.__name__, repr(oException.msg));

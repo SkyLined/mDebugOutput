@@ -4,22 +4,22 @@ def fdxExceptionDetailsForSyntaxError(oException):
       [
         guExceptionInformationColor, "Syntax error in ", guExceptionInformationHighlightColor, str(oException.filename),
         [
-          guExceptionInformationColor, " on lines ",
+          guExceptionInformationColor, " starting on line ",
           guExceptionInformationHighlightColor, str(oException.lineno),
-          guExceptionInformationColor, "-",
-          guExceptionInformationHighlightColor, str(oException.end_lineno),
-          guExceptionInformationColor, ", starting at column ",
+          guExceptionInformationColor, ", column ",
           guExceptionInformationHighlightColor, str(oException.offset),
-          guExceptionInformationColor, " and ending at ",
+          guExceptionInformationColor, " and ending on line ",
+          guExceptionInformationHighlightColor, str(oException.end_lineno),
+          guExceptionInformationColor, ", column ",
           guExceptionInformationHighlightColor, str(oException.end_offset),
         ] if oException.lineno != oException.end_lineno else [
           guExceptionInformationColor, " on line ",
           guExceptionInformationHighlightColor, str(oException.lineno),
-          guExceptionInformationColor, ", columns ",
+          guExceptionInformationColor, ", starting at column ",
           guExceptionInformationHighlightColor, str(oException.offset),
-          guExceptionInformationColor, "-",
+          guExceptionInformationColor, " and ending at column ",
           guExceptionInformationHighlightColor, str(oException.end_offset),
-        ] if oException.offset != oException.end_offset - 1 and oException.end_offset != -1 else [
+        ] if oException.end_offset - oException.offset > 1 else [
           guExceptionInformationColor, " on line ",
           guExceptionInformationHighlightColor, str(oException.lineno),
           guExceptionInformationColor, ", column ", guExceptionInformationHighlightColor, str(oException.offset),
@@ -27,7 +27,7 @@ def fdxExceptionDetailsForSyntaxError(oException):
         guExceptionInformationColor, ":",
       ],
       [
-        guExceptionInformationColor, "  ", oException.msg,
+        guExceptionInformationColor, oException.msg,
       ],
     ],
     "dxHiddenProperties": {
