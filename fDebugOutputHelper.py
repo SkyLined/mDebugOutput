@@ -1,5 +1,6 @@
-import os, threading, time, traceback;
+import os, threading, time;
 
+from .dxConfig import dxConfig;
 from .foConsoleLoader import foConsoleLoader;
 from .mGlobals import *;
 
@@ -46,8 +47,9 @@ def fDebugOutputHelper(u0ThreadId, s0ThreadName, sSourceFilePath, uLineNumber, x
     uIndentation -= 1;
     sSingleIndentationHeader = sLastIndentationHeader = (" \u2502" * (uIndentation - 1)) + (" \u251C" if uIndentation else "") + "\u2500\u2518";
   sSourceCodeHeader = (
-    "%33s/%-5s" % (
+    "%33s%s%-5s" % (
       os.path.basename(sSourceFilePath),
+      dxConfig["sLineNumberAfterPathPrefix"],
       str(uLineNumber) + (
         "\u25C4" if bIsReturnAddress else
         "\u25B2" if uIndentationChange < 0 else # must be an exception!

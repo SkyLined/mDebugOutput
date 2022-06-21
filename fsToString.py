@@ -1,5 +1,7 @@
 import inspect, types;
 
+from .dxConfig import dxConfig;
+
 gbmNotProvidedLoaded = False; # mNotProvided is loaded JIT to prevent import dependency issues.
 gz0NotProvided = None;
 def fsToString(xData, uMaxLength = 1000):
@@ -32,11 +34,19 @@ def fsToString(xData, uMaxLength = 1000):
     else:
       sData = "method %s(#%X).%s" % (xData.__self__.__class__.__name__, id(xData.__self__), xData.__name__);
     if hasattr(xData, "__func__") and hasattr(xData.__func__, "__code__"):
-      sData += " @ %s/%d" % (xData.__func__.__code__.co_filename, xData.__func__.__code__.co_firstlineno);
+      sData += " @ %s%s%d" % (
+        xData.__func__.__code__.co_filename,
+        dxConfig["sLineNumberAfterPathPrefix"],
+        xData.__func__.__code__.co_firstlineno
+      );
   elif isinstance(xData, types.FunctionType):
     sData = "function %s" % (xData.__name__,);
     if hasattr(xData, "__code__"):
-      sData += " @ %s/%d" % (xData.__code__.co_filename, xData.__code__.co_firstlineno);
+      sData += " @ %s%s%d" % (
+        xData.__code__.co_filename,
+        dxConfig["sLineNumberAfterPathPrefix"],
+        xData.__code__.co_firstlineno
+      );
   elif isinstance(xData, set):
     sData = fsEnumerate("set(%s)", xData, lambda xValue: fsToString(xValue, uMaxLength));
   elif isinstance(xData, tuple):

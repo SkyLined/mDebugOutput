@@ -1,5 +1,7 @@
 ﻿import inspect;
 
+from .dxConfig import dxConfig;
+
 def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True):
   aasConsoleOutputLines = [];
   # Header
@@ -61,7 +63,8 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
             guStackTreeColor, " ╷" * (uCurrentFrameIndex - 1), " ├" if uCurrentFrameIndex > 0 else "", "─┐ ",
             guStackAtExceptionCallDescriptionColor, "<module>",
             guStackAtExceptionCallDescriptionAndLocationJoinerColor, " @ ",
-            guStackAtExceptionSourceFilePathColor, str(oException.filename), "/", str(oException.lineno),
+            guStackAtExceptionSourceFilePathColor, str(oException.filename),
+                dxConfig["sLineNumberAfterPathPrefix"], str(oException.lineno),
           ] + (
             ["/", str(oException.offset)] if oException.offset is not None else []
           )

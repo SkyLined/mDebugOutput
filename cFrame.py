@@ -1,5 +1,6 @@
 import inspect, os, sys, threading;
 
+from .dxConfig import dxConfig;
 from .mColorsAndChars import *;
 # The rest of the imports are done at the bottom to prevent import loops.
 
@@ -214,10 +215,10 @@ class cFrame():
   def sExceptionCodeLocation(oSelf):
     assert oSelf.u0ExceptionLineNumber is not None, \
         "This frame does not appear to be for an exception, as there is no exception line number specified!";
-    return "%s/%d" % (oSelf.sSourceFilePath, oSelf.u0ExceptionLineNumber);
+    return "%s%s%d" % (oSelf.sSourceFilePath, dxConfig["sLineNumberAfterPathPrefix"], oSelf.u0ExceptionLineNumber);
   @property
   def sLastExecutedCodeLocation(oSelf):
-    return "%s/%d" % (oSelf.sSourceFilePath, oSelf.uLastExecutedLineNumber);
+    return "%s%s%d" % (oSelf.sSourceFilePath, dxConfig["sLineNumberAfterPathPrefix"], oSelf.uLastExecutedLineNumber);
   
   def ftxGetCallArguments(oSelf):
     atArgument_xValue_and_sNames = [
@@ -307,15 +308,15 @@ class cFrame():
   
   @property
   def sLastExecutedCodeLocation(oSelf):
-    return "%s/%d" % (oSelf.sSourceFilePath, oSelf.uLastExecutedLineNumber);
+    return "%s%s%d" % (oSelf.sSourceFilePath, dxConfig["sLineNumberAfterPathPrefix"], oSelf.uLastExecutedLineNumber);
   
   def fsToString(oSelf):
-    return "<%s#%X %s/%s @ %s, thread %s>" % (
+    return "<%s#%X %s %s @ %s, thread %s>" % (
       oSelf.__class__.__name__, id(oSelf),
       oSelf.sCallDescription, 
-      "%d" % oSelf.uLastExecutedLineNumber if oSelf.u0ExceptionLineNumber is None else \
-          "*%d" if oSelf.uLastExecutedLineNumber == oSelf.u0ExceptionLineNumber else \
-          "*%d/%d" % (oSelf.u0ExceptionLineNumber, oSelf.u0LastExecutedLineNumber),
+      "at line %d" % oSelf.uLastExecutedLineNumber if oSelf.u0ExceptionLineNumber is None else \
+          "at except line %d" if oSelf.uLastExecutedLineNumber == oSelf.u0ExceptionLineNumber else \
+          "*at except line %d/line %d" % (oSelf.u0ExceptionLineNumber, oSelf.u0LastExecutedLineNumber),
       oSelf.sSourceFilePath,
       "%d/0x%X (%s)" % (oSelf.u0ThreadId, oSelf.u0ThreadId, oSelf.s0ThreadName) if oSelf.u0ThreadId else \
           "unknown",
