@@ -1,9 +1,12 @@
+import re;
+
 from .fdxExceptionDetailsForAssertionError import fdxExceptionDetailsForAssertionError;
 from .fdxExceptionDetailsForAttributeError import fdxExceptionDetailsForAttributeError;
 from .fdxExceptionDetailsForImportError import fdxExceptionDetailsForImportError;
 from .fdxExceptionDetailsForKeyError import fdxExceptionDetailsForKeyError;
 from .fdxExceptionDetailsForModuleNotFoundError import fdxExceptionDetailsForModuleNotFoundError;
 from .fdxExceptionDetailsForNameError import fdxExceptionDetailsForNameError;
+from .fdxExceptionDetailsForReError import fdxExceptionDetailsForReError;
 from .fdxExceptionDetailsForSyntaxError import fdxExceptionDetailsForSyntaxError;
 from .fdxExceptionDetailsForTypeError import fdxExceptionDetailsForTypeError;
 from .fdxExceptionDetailsForUnboundLocalError import fdxExceptionDetailsForUnboundLocalError;
@@ -14,7 +17,7 @@ from .fdxExceptionDetailsForWindowsError import fdxExceptionDetailsForWindowsErr
 # Optional
 try: 
   from json.decoder import JSONDecodeError as JSONDecodeError;
-except Ec:
+except:
   bJSONSupportEnabled = False;
 else:
   bJSONSupportEnabled = True;
@@ -43,6 +46,8 @@ def fdxExceptionDetails(oException, oTraceback):
       return fdxExceptionDetailsForUnboundLocalError(oException);
     else:
       return fdxExceptionDetailsForNameError(oException);
+  elif isinstance(oException, re.error):
+    return fdxExceptionDetailsForReError(oException);
   elif isinstance(oException, SyntaxError):
     return fdxExceptionDetailsForSyntaxError(oException);
   elif isinstance(oException, TypeError):
