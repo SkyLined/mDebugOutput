@@ -1,10 +1,8 @@
-import inspect, os, sys, threading;
+import inspect, sys, threading;
 
 from .cFrame import cFrame;
-from .fasGetSourceCode import fasGetSourceCode;
 from .faasCreateConsoleOutputForStack import faasCreateConsoleOutputForStack;
 from .fDumpPythonFrame import fDumpPythonFrame;
-from .fsGetClassAndFunctionForClassAndCode import fsGetClassAndFunctionForClassAndCode;
 
 gbDebugDumpRawStacksAndTracebacks = False;
 
