@@ -28,6 +28,7 @@ def fdxExceptionDetailsForImportError(oException):
       "name": None,
       "path": oException.path, # Currently not shown - I've only seen this set to None.
       "with_traceback": oException.with_traceback,
+      "add_note": oException.add_note,
     }, 
     "bShowLocals": False,
   };

@@ -11,10 +11,11 @@ def fdxExceptionDetailsForModuleNotFoundError(oException):
     ],
     "dxHiddenProperties": {
       "args": oException.args,
+      "with_traceback": oException.with_traceback,
+      "add_note": oException.add_note,
       "msg": oException.msg,
       "name": oException.name,
       "path": oException.path, # Currently not shown - I've only seen this set to None.
-      "with_traceback": oException.with_traceback,
     }, 
     "bShowLocals": False,
   };

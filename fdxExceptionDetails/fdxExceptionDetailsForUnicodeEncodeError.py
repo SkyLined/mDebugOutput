@@ -51,6 +51,7 @@ def fdxExceptionDetailsForUnicodeEncodeError(oException):
     "dxHiddenProperties": {
       "args": (oException.encoding, oException.object, oException.start, oException.end, oException.reason),
       "with_traceback": oException.with_traceback,
+      "add_note": oException.add_note,
       "encoding": oException.encoding,
       "end": oException.end,
       "object": oException.object,

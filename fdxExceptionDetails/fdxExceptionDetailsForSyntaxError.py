@@ -33,6 +33,7 @@ def fdxExceptionDetailsForSyntaxError(oException):
     "dxHiddenProperties": {
       "args": (oException.msg, (oException.filename, oException.lineno, oException.offset, oException.text, oException.end_lineno, oException.end_offset)),
       "with_traceback": oException.with_traceback,
+      "add_note": oException.add_note,
       "filename": oException.filename,
       "lineno": oException.lineno,
       "end_lineno": oException.end_lineno,

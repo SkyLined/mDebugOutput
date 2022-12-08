@@ -71,6 +71,7 @@ def fdxExceptionDetailsForWindowsError(oException):
         (oException.errno, oException.strerror, None, oException.winerror, None)
       ),
       "with_traceback": oException.with_traceback,
+      "add_note": oException.add_note,
       "errno": oException.errno,
       "filename": oException.filename,
       "filename2": oException.filename2,

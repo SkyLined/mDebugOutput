@@ -12,6 +12,7 @@ def fdxExceptionDetailsForNameError(oException):
   dxHiddenProperties = {
     "args": oException.args,
     "with_traceback": oException.with_traceback,
+    "add_note": oException.add_note,
   };
   if hasattr(oException, "name"):
     dxHiddenProperties["name"] = sVariableName if oException.name is not None else None;

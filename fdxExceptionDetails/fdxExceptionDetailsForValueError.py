@@ -31,6 +31,7 @@ def fdxExceptionDetailsForValueError(oException):
     "dxHiddenProperties": {
       "args": oException.args,
       "with_traceback": oException.with_traceback,
+      "add_note": oException.add_note,
     },
   };
 

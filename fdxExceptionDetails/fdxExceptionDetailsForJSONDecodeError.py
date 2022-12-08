@@ -57,6 +57,7 @@ def fdxExceptionDetailsForJSONDecodeError(oException):
       "msg": oException.msg,
       "pos": oException.pos,
       "with_traceback": oException.with_traceback,
+      "add_note": oException.add_note,
     },
   };
 

@@ -95,6 +95,7 @@
     "dxHiddenProperties": {
       "args": (oException.sMessage,),
       "with_traceback": oException.with_traceback,
+      "add_note": oException.add_note,
       "sMessage": oException.sMessage,
       "sDLLName": oException.sDLLName,
       "sFunctionName": oException.sFunctionName,

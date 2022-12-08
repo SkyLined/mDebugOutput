@@ -54,12 +54,13 @@ def fdxExceptionDetailsForReError(oException):
     "aasConsoleOutputLines": aasConsoleOutputLines,
     "dxHiddenProperties": {
       "args": oException.args,
+      "with_traceback": oException.with_traceback,
+      "add_note": oException.add_note,
       "colno": oException.colno,
       "lineno": oException.lineno,
       "msg": oException.msg,
       "pattern": oException.pattern,
       "pos": oException.pos,
-      "with_traceback": oException.with_traceback,
     },
   };
 

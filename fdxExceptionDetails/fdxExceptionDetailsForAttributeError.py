@@ -6,6 +6,7 @@ def fdxExceptionDetailsForAttributeError(oException):
   dxHiddenProperties = {
     "args": oException.args,
     "with_traceback": oException.with_traceback,
+    "add_note": oException.add_note,
     "name": oException.name,
     "obj": oException.obj,
   };
