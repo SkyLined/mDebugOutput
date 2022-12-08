@@ -15,31 +15,18 @@ def ShowDebugOutput(fxFunction):
   if sBadDecorator:
     raise AssertionError("@ShowDebugOutput must not be followed by %s!" % sBadDecorator);
   sSourceFilePath = fxFunction.__code__.co_filename;
-  (axArgumentNames, stxArgumentName, sdxArgumentName, txDefaultArgumentValues) = inspect.getargspec(fxFunction);
-  sFirstArgumentName = axArgumentNames[0] if len(axArgumentNames) > 0 and isinstance(axArgumentNames[0], str) else None;
-  dxDefaultArgumentValue_by_xName = {};
-  if txDefaultArgumentValues:
-    for uArgumentIndex in range(-len(txDefaultArgumentValues), 0, 1):
-      xArgumentName = axArgumentNames[uArgumentIndex];
-      xDefaultArgumentValue = txDefaultArgumentValues[uArgumentIndex];
-      dxDefaultArgumentValue_by_xName[xArgumentName] = xDefaultArgumentValue;
-  if gbShowInternalDebugOutput:
-    print("@ WRAP %s(%s%s%s) @ %s" % (
-      fxFunction.__name__,
-      ", ".join([
-        "%s%s" % (
-          repr(xArgumentName),
-          " = %s" % repr(dxDefaultArgumentValue_by_xName[xArgumentName])
-            if xArgumentName in dxDefaultArgumentValue_by_xName
-            else ""
-        )
-        for xArgumentName in axArgumentNames
-      ]),
-      ", *%s" % stxArgumentName if stxArgumentName is not None else "",
-      ", **%s" % sdxArgumentName if sdxArgumentName is not None else "",
-      sSourceFilePath
-    ));
-    print("  sFirstArgumentName: %s" % sFirstArgumentName);
+  oSignature = inspect.signature(fxFunction);
+  axArgumentNames = list(oSignature.parameters.keys());
+  s0FirstArgumentName = None;
+  s0txArgumentName = None;
+  s0dxArgumentName = None;
+  for oParameter in oSignature.parameters.values():
+    if s0FirstArgumentName is None:
+      s0FirstArgumentName = oParameter.name;
+    if oParameter.kind == inspect.Parameter.VAR_POSITIONAL:
+      s0txArgumentName = oParameter.name;
+    elif oParameter.kind == inspect.Parameter.VAR_KEYWORD:
+      s0dxArgumentName = oParameter.name;
   
   @functools.wraps(fxFunction)
   def fxFunctionWrapper(*txCallArgumentValues, **dxCallArgumentValues):
@@ -54,9 +41,9 @@ def ShowDebugOutput(fxFunction):
       cClass = None;
       if gbShowInternalDebugOutput:
         print("@ CALL %s(%s, %s)" % (fxFunction.__name__, repr(txCallArgumentValues)[1:-1], repr(dxCallArgumentValues)[1:-1]));
-      if sFirstArgumentName is not None:
-        if sFirstArgumentName in dxCallArgumentValues:
-          xFirstArgumentValue = dxCallArgumentValues[sFirstArgumentName];
+      if axArgumentNames:
+        if s0FirstArgumentName in dxCallArgumentValues:
+          xFirstArgumentValue = dxCallArgumentValues[s0FirstArgumentName];
         else:
           xFirstArgumentValue = txCallArgumentValues[0];
         (oInstance, cClass) = ftocGetInstanceAndClassForUnknown(xFirstArgumentValue);
@@ -82,8 +69,7 @@ def ShowDebugOutput(fxFunction):
           xName = axArgumentNames[uIndex];
           axUnusedArgumentNames.remove(xName);
           asUnnamedCallArguments.append("%s = %s" % (xName, fsToString(xValue, guArgumentAsStringMaxSize)));
-          sName = repr(xName);
-        elif stxArgumentName:
+        elif s0txArgumentName:
           txCallArgument = tuple(txCallArgumentValues[uIndex:]);
           break;
         else:
@@ -98,12 +84,12 @@ def ShowDebugOutput(fxFunction):
           axUnusedNamedCallArgumentNames.remove(xName);
           asNamedCallArguments.append("%s = %s" % (xName, fsToString(xValue, guArgumentAsStringMaxSize)));
           axUnusedArgumentNames.remove(xName);
-        elif xName not in dxDefaultArgumentValue_by_xName:
+        else:
           # This argument is missing
           asNamedCallArguments.append("%s = ???" % (xName,));
       # Handle unused named arguments:
       if len(axUnusedNamedCallArgumentNames) > 0:
-        if sdxArgumentName:
+        if s0dxArgumentName:
           for xName in axUnusedNamedCallArgumentNames:
             dxCallArgument[xName] = dxCallArgumentValues[xName];
         else:
@@ -111,11 +97,11 @@ def ShowDebugOutput(fxFunction):
             asNamedCallArguments.append("%s??? = %s" % (xName, fsToString(dxCallArgumentValues[xName], guArgumentAsStringMaxSize)));
       # Put everything together:
       asCallArguments = asUnnamedCallArguments;
-      if stxArgumentName:
-        asCallArguments.append("*%s = %s" % (stxArgumentName, fsToString(txCallArgument, guArgumentAsStringMaxSize)));
+      if s0txArgumentName:
+        asCallArguments.append("*%s = %s" % (s0txArgumentName, fsToString(txCallArgument, guArgumentAsStringMaxSize)));
       asCallArguments += asNamedCallArguments;
-      if sdxArgumentName:
-        asCallArguments.append("**%s = %s" % (sdxArgumentName, fsToString(dxCallArgument, guArgumentAsStringMaxSize)));
+      if s0dxArgumentName:
+        asCallArguments.append("**%s = %s" % (s0dxArgumentName, fsToString(dxCallArgument, guArgumentAsStringMaxSize)));
       sCallArguments = ", ".join(asCallArguments);
       # This function is hidden, so if we ask for the the frame for this function, we will get
       # the frame of its caller.
