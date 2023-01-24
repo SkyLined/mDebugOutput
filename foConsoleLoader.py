@@ -45,7 +45,7 @@ class oConsoleStandIn(object):
     cClass.oLock.release();
   @classmethod
   def fCleanup(cClass):
-    print("\r" + sOutput.ljust(cClass.uCurrentLineLength) + "\r", sep="", end="", flush=True);
+    print("\r".ljust(cClass.uCurrentLineLength) + "\r", sep="", end="", flush=True);
     cClass.uCurrentLineLength = 0;
   @classmethod
   def fOutput(cClass, *txArguments, **dxArguments):
@@ -59,7 +59,7 @@ class oConsoleStandIn(object):
     cClass.uCurrentLineLength = len(sOutput);
   @classmethod
   def fProgressBar(cClass, nProgress, sMessage = "", **dxArguments):
-    cCLass.fStatus(int(100 * nProgress), "%", sMessage);
+    cClass.fStatus(int(100 * nProgress), "%", sMessage);
   @classmethod
   def fSetTitele(cClass, sTitle):
     pass;
