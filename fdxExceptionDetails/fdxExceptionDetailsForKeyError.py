@@ -3,7 +3,7 @@ import re;
 def fdxExceptionDetailsForKeyError(oException):
   if len(oException.args) < 1:
     return {};
-  sKeyName = oException.args[0];
+  sKeyName = repr(oException.args[0]);
   return {
     "aasConsoleOutputLines": [
       [
