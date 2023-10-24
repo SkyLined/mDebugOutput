@@ -15,6 +15,7 @@ def fdxExceptionDetailsForModuleNotFoundError(oException):
       "add_note": oException.add_note,
       "msg": oException.msg,
       "name": oException.name,
+      "name_from": None, # This is undocumented - I've only seen this set to None.
       "path": oException.path, # Currently not shown - I've only seen this set to None.
     }, 
     "bShowLocals": False,

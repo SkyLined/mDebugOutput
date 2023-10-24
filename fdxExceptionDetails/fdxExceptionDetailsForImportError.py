@@ -26,6 +26,7 @@ def fdxExceptionDetailsForImportError(oException):
       "args": (oException.msg,),
       "msg": oException.msg,
       "name": None,
+      "name_from": None, # This is undocumented - I've only seen this set to None.
       "path": oException.path, # Currently not shown - I've only seen this set to None.
       "with_traceback": oException.with_traceback,
       "add_note": oException.add_note,
