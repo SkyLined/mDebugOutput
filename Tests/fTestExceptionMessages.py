@@ -89,11 +89,12 @@ def fTestExceptionMessages():
   ):
     try:
       fRaiseException();
-    except Exception as oException:
+    except BaseException as oException:
       oTraceback = sys.exc_info()[2];
       o0PythonThread = None;
       oStack = cCallStack.foFromTraceback(oTraceback, o0PythonThread);
       aasOutputlines = faasCreateConsoleOutputForException(oException, oTraceback, oStack);
+      bErrorDetectedInOutput = False;
       for asOutputLine in aasOutputlines:
         sOutput = "";
         while asOutputLine:
@@ -106,7 +107,13 @@ def fTestExceptionMessages():
             assert isinstance(xOutput, int), \
                 "Unexpected type in output: %s" % repr(xOutput);
         if sOutput in ["Exception attributes:", "Additional exception attributes:"]:
-          # This was not processed properly; show the output again and terminate with an error code.
-          fTerminateWithException(oException, 1);
+          print("@@@ The exception was not handled correctly; additional exception attributes were found @@@");
+          bErrorDetectedInOutput = True;
+        if bErrorDetectedInOutput:
+          print("@ " + sOutput);
+      if bErrorDetectedInOutput:
+        print("@" * 80);
+        # This was not processed properly; show the output again and terminate with an error code.
+        fTerminateWithException(oException, 1);
     else:
       raise AssertionError("%s did not raise an exception!?" % fRaiseException);
