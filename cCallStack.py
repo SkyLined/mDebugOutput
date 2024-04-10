@@ -16,7 +16,7 @@ class cCallStack():
   def __foFromPythonFramesAndExceptionLineAndCharacterNumbers(cClass, atxPythonFramesAndExceptionLineAndCharacterNumbers, o0PythonThread = None):
     if o0PythonThread is None:
       try: # This can fail during shutdown, so we catch any exceptions and ignore them.
-        o0PythonThread = threading.currentThread();
+        o0PythonThread = threading.current_thread();
       except:
         pass;
     return cClass(
@@ -35,7 +35,7 @@ class cCallStack():
     return cClass.foForCurrentThread(uEndIndex = 2);
   @classmethod
   def foForCurrentThread(cClass, uStartIndex = None, uEndIndex = None):
-    return cClass.foFromPythonFrameAndThread(inspect.currentframe(), threading.currentThread(), uStartIndex, uEndIndex);
+    return cClass.foFromPythonFrameAndThread(inspect.currentframe(), threading.current_thread(), uStartIndex, uEndIndex);
   @classmethod
   def foFromPythonFrameAndThread(cClass, oPythonFrame, o0PythonThread, uStartIndex = 0, uEndIndex = 0):
     # Create a list of all PythonFrames on the stack in the current thread.
@@ -87,7 +87,7 @@ class cCallStack():
       (oPythonThread.ident, oPythonThread)
       for oPythonThread in threading.enumerate()
      ])
-     uCurrentThreadId = threading.currentThread().ident;
+     uCurrentThreadId = threading.current_thread().ident;
      return [
        cClass.foFromPythonFrameAndThread(
          oTopPythonFrame,

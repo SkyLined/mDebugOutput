@@ -24,7 +24,7 @@ def fConsoleOutputExceptionDetails(oException, o0Traceback = None, o0PythonThrea
   aasConsoleOutputLines += faasCreateConsoleOutputForStack(oStack, oException);
   
   if bShowStacksForAllThread:
-    oPythonThread = threading.currentThread();
+    oPythonThread = threading.current_thread();
     doStack_by_uThreadId = dict([
       (oStack.u0ThreadId, oStack)
       for oStack in cCallStack.faoForAllThreads()

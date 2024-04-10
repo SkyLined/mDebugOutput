@@ -83,7 +83,7 @@ class cFrame():
     if not o0WantedPythonFrame:
       return None; # All frames are hidden.
     try: # This can fail during shutdown, so we catch any exceptions and ignore them.
-      o0PythonThread = threading.currentThread();
+      o0PythonThread = threading.current_thread();
     except:
       o0PythonThread = None;
     return cClass.foFromPythonFrameThreadAndExceptionLineAndCharacterNumber(
