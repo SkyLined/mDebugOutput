@@ -7,14 +7,16 @@ def fTerminateWithException(
   bShowStacksForAllThread = False,
   bPauseBeforeExit = False,
 ):
-  fConsoleOutputExceptionDetails(
-    oException,
-    a0asAdditionalConsoleOutputLines = a0asAdditionalConsoleOutputLines,
-    bShowStacksForAllThread = bShowStacksForAllThread,
-  );
-  if bPauseBeforeExit:
-    input("Press any key to exit...");
-  os._exit(uExitCode);
+  try:
+    fConsoleOutputExceptionDetails(
+      oException,
+      a0asAdditionalConsoleOutputLines = a0asAdditionalConsoleOutputLines,
+      bShowStacksForAllThread = bShowStacksForAllThread,
+    );
+  finally:
+    if bPauseBeforeExit:
+      input("Press any key to exit...");
+    os._exit(uExitCode);
 
 from .fConsoleOutputExceptionDetails import fConsoleOutputExceptionDetails;
 
