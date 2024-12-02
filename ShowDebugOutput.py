@@ -33,7 +33,7 @@ def ShowDebugOutput(fxFunction):
     mDebugOutput_HideInCallStack = True; # Any exception in this code is likely not to be caused by this code.
     try:
       # This can fail if Python is ending, hence try....catch
-      o0PythonThread = threading.currentThread();
+      o0PythonThread = threading.current_thread();
     except:
       o0PythonThread = None;
     try:
