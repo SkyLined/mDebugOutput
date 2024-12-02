@@ -1,4 +1,4 @@
-import os;
+import os, traceback;
 
 def fTerminateWithException(
   oException,
@@ -13,6 +13,10 @@ def fTerminateWithException(
       a0asAdditionalConsoleOutputLines = a0asAdditionalConsoleOutputLines,
       bShowStacksForAllThread = bShowStacksForAllThread,
     );
+  except Exception as oInternalException:
+    print("*** INTERNAL EXCEPTION IN EXCEPTION HANDLER ***");
+    print(traceback.format_exc());
+    print("Original exception: %s" % repr(oException));
   finally:
     if bPauseBeforeExit:
       input("Press any key to exit...");
