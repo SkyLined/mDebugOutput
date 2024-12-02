@@ -19,7 +19,7 @@ def fdxExceptionDetailsForWindowsError(oException):
         [
           guExceptionInformationColor, " / ",
           guExceptionInformationHighlightColor, "0x%X" % oException.errno, 
-        ] if oException.errno > 10 else [],
+        ] if oException.errno is not None and oException.errno > 10 else [],
         guExceptionInformationColor, ".",
       ],
     ];
