@@ -18,70 +18,71 @@ def fDebugOutputHelper(u0ThreadId, s0ThreadName, sSourceFilePath, uLineNumber, x
   oConsole = foConsoleLoader();
   
   asOutputLines = xOutputLines if isinstance(xOutputLines, list) else [xOutputLines];
-  sThreadIdHeader = "".join([
-    "%4X" % u0ThreadId,
-    "\u2022" if u0ThreadId == guMainThreadId else "\u00B7",
-    s0ThreadName or "<unnamed>",
-  ])[:64].ljust(64) if u0ThreadId is not None else "<unknown thread>";
   sTime = "%8.4f" % (time.time() - gnStartTime);
+  sThreadIdHeader = "%5X" % u0ThreadId if u0ThreadId is not None else "?????";
   uIndex = 0;
   uIndentation = guIndentation_by_uThreadId.setdefault(u0ThreadId, 0) if u0ThreadId is not None else 0;
   if uIndentationChange == 1:
     if u0ThreadId is not None:
       guIndentation_by_uThreadId[u0ThreadId] += 1;
-    sSingleIndentationHeader = sFirstIndentationHeader = (" \u2502" * (uIndentation - 1)) + (" \u251C" if uIndentation else "") + "\u2500\u2510";
+    sSingleIndentationHeader = sFirstIndentationHeader = (" :" * (uIndentation - 1)) + (" ├" if uIndentation else "") + "─╮";
     uIndentation += 1;
-    sMiddleIndentationHeader = sLastIndentationHeader = (" \u2502" * uIndentation);
+    sMiddleIndentationHeader = sLastIndentationHeader = (" :" * (uIndentation - 1)) + " │";
   elif uIndentationChange != -1:
     assert uIndentationChange == 0, \
         "Invalid uIndentationChange value %d" % uIndentationChange;
     sSingleIndentationHeader = sFirstIndentationHeader = \
-        sMiddleIndentationHeader = sLastIndentationHeader = " \u2502" * uIndentation;
+        sMiddleIndentationHeader = sLastIndentationHeader = (" :" * (uIndentation - 1)) + " │";
   else:
     if u0ThreadId is not None:
       if guIndentation_by_uThreadId[u0ThreadId] == 1:
         del guIndentation_by_uThreadId[u0ThreadId];
       else:
         guIndentation_by_uThreadId[u0ThreadId] -= 1;
-    sFirstIndentationHeader = sMiddleIndentationHeader = " \u2502" * uIndentation;
+    sFirstIndentationHeader = sMiddleIndentationHeader = " :" * uIndentation;
     uIndentation -= 1;
-    sSingleIndentationHeader = sLastIndentationHeader = (" \u2502" * (uIndentation - 1)) + (" \u251C" if uIndentation else "") + "\u2500\u2518";
+    sSingleIndentationHeader = sLastIndentationHeader = (
+      (
+        (( (" :" * (uIndentation - 1)) + " ├") if uIndentation else "") +
+        "─╯"
+      ) if bIsReturnAddress else (
+        (" :" * uIndentation) + "←✘"
+      )
+    );
   sSourceCodeHeader = (
-    "%33s%s%-5s" % (
+    "%s%s%-5s" % (
       os.path.basename(sSourceFilePath),
       dxConfig["sLineNumberAfterPathPrefix"],
-      str(uLineNumber) + (
-        "\u25C4" if bIsReturnAddress else
-        "\u25B2" if uIndentationChange < 0 else # must be an exception!
-        " "
-      ),
+      str(uLineNumber),
     )
-  )[-39:];
+  ).rjust(50)[-50:];
   # Add headers to all output lines:
   asActualOutput = [];
   for sOutputLine in asOutputLines:
     if len(asOutputLines) == 1:
       sIndentationHeader = sSingleIndentationHeader;
-      sMessageHeader = "";
+      sMessageHeader = " ";
     elif uIndex == 0:
       sIndentationHeader = sFirstIndentationHeader;
-      sMessageHeader = "\u250C";
+      sMessageHeader = " ┌";
     elif uIndex != len(asOutputLines) - 1:
       sIndentationHeader = sMiddleIndentationHeader;
-      sMessageHeader = "\u2502";
-      sTime = ": ".rjust(len(sTime));
-      sThreadIdHeader = " \u00B7".ljust(len(sThreadId));
-      sSourceCodeHeader = "\u00B7    ".rjust(len(sSourceCodeHeader));
+      sMessageHeader = " │";
+      # blank out the first 3 columns
+      sTime = " " * len(sTime);
+      sThreadIdHeader = " " * len(sThreadIdHeader);
+      sSourceCodeHeader = " " * len(sSourceCodeHeader);
     else:
       sIndentationHeader = sLastIndentationHeader;
-      sMessageHeader = "\u2514";
-      sTime = "\u00B7\u00B7 ".rjust(len(sTime));
-      sThreadIdHeader = " \u00B7\u00B7".ljust(len(sThreadId));
-      sSourceCodeHeader = "\u00B7\u00B7\u00B7    ".rjust(len(sSourceCodeHeader));
+      sMessageHeader = " └";
+      # blank out the first 3 columns
+      sTime = " " * len(sTime);
+      sThreadIdHeader = " " * len(sThreadIdHeader);
+      sSourceCodeHeader = " " * len(sSourceCodeHeader);
     uIndex += 1;
-    asActualOutput.append("\u2502".join([
+    asActualOutput.append("│".join([
       sTime,
-      sThreadIdHeader[:64].ljust(64),
+      sThreadIdHeader,
       sSourceCodeHeader,
     ]) + sIndentationHeader + sMessageHeader + sOutputLine);
   # Actually output the lines:
