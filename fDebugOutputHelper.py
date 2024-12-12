@@ -13,7 +13,7 @@ assert len(aoPythonThreads) == 1, \
     "Expected only 1 thread!";
 guMainThreadId = aoPythonThreads[0].ident;
 
-def fDebugOutputHelper(u0ThreadId, s0ThreadName, sSourceFilePath, uLineNumber, xOutputLines, uIndentationChange = 0, bAlwaysShow = False, bIsReturnAddress = False):
+def fDebugOutputHelper(u0ThreadId, s0ThreadName, sSourceFilePath, u0LineNumber, xOutputLines, uIndentationChange = 0, bAlwaysShow = False, bIsReturnAddress = False):
   global guThreadColor_by_uThreadId, gauThreadColors;
   oConsole = foConsoleLoader();
   
@@ -52,8 +52,8 @@ def fDebugOutputHelper(u0ThreadId, s0ThreadName, sSourceFilePath, uLineNumber, x
   sSourceCodeHeader = (
     "%s%s%-5s" % (
       os.path.basename(sSourceFilePath),
-      dxConfig["sLineNumberAfterPathPrefix"],
-      str(uLineNumber),
+      dxConfig["sLineNumberAfterPathPrefix"] if u0LineNumber is not None else " " * len(dxConfig["sLineNumberAfterPathPrefix"]),
+      str(u0LineNumber) if u0LineNumber is not None else "",
     )
   ).rjust(50)[-50:];
   # Add headers to all output lines:

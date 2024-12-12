@@ -102,22 +102,34 @@ def ShowDebugOutput(fxFunction):
       asCallArguments += asNamedCallArguments;
       if s0dxArgumentName:
         asCallArguments.append("**%s = %s" % (s0dxArgumentName, fsToString(dxCallArgument, guArgumentAsStringMaxSize)));
-      sCallArguments = ", ".join(asCallArguments);
       # This function is hidden, so if we ask for the the frame for this function, we will get
       # the frame of its caller.
       oCallFrame = cFrame.fo0ForCurrentThreadAndFunction();
       if gbShowInternalDebugOutput:
-        if not bShowDebugOutput:
-          print("@ HIDE %s(%s) @ %s" % (sCallDescription, sCallArguments, repr(sSourceFilePath)));
-        else:
+        sCallArguments = ", ".join(asCallArguments);
+        if bShowDebugOutput:
           print("@ SHOW %s(%s) @ %s" % (sCallDescription, sCallArguments, repr(sSourceFilePath)));
+        else:
+          print("@ HIDE %s(%s) @ %s" % (sCallDescription, sCallArguments, repr(sSourceFilePath)));
       if bShowDebugOutput:
         fDebugOutputHelper(
           oCallFrame.u0ThreadId, oCallFrame.s0ThreadName,
           oCallFrame.sSourceFilePath, oCallFrame.uLastExecutedLineNumber,
-          "%s(%s)" % (sCallDescription, sCallArguments),
+          "%s(%s" % (sCallDescription,"" if len(asCallArguments) > 0 else ")"),
           uIndentationChange = +1,
         );
+        if asCallArguments:
+          for sCallArgument in asCallArguments:
+            fDebugOutputHelper(
+              oCallFrame.u0ThreadId, "",
+              "", None,
+              "  %s" % (sCallArgument,),
+            );
+          fDebugOutputHelper(
+            oCallFrame.u0ThreadId, "",
+            "", None,
+            ")",
+          );
     except Exception as oException:
       fTerminateWithException(oException, guExitCodeInternalError);
     if not bShowDebugOutput:
