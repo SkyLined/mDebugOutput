@@ -9,7 +9,7 @@ def fsGetClassAndFunctionForClassAndCode(cClass, oCode):
   if gbDebugOutput: asLog.append("Looking for %s (%s from %s)" % (repr(oCode), sFunctionName, sCodeFileName));
   
   def foGetCodeForFunction(xPotentialFunction):
-    if not xPotentialFunction:
+    if not callable(xPotentialFunction):
       return None;
     # Handle @ShowDebugOutput wrapped functions:
     fxWrappedFunction = getattr(xPotentialFunction, "fxWrappedFunction", None);
