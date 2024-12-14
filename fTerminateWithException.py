@@ -1,4 +1,4 @@
-import os, traceback;
+import os, sys, traceback;
 
 def fTerminateWithException(
   oException,
@@ -7,6 +7,8 @@ def fTerminateWithException(
   bShowStacksForAllThread = False,
   bPauseBeforeExit = False,
 ):
+  if isinstance(oException, RecursionError):
+    sys.setrecursionlimit(sys.getrecursionlimit() + 100);
   try:
     fConsoleOutputExceptionDetails(
       oException,
