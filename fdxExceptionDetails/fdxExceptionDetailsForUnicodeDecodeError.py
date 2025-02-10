@@ -1,7 +1,7 @@
 def fdxExceptionDetailsForUnicodeDecodeError(oException):
-  sInputString = oException.object;
-  sOffensiveChars = sInputString[oException.start: oException.end];
-  bInputIsUnicode = isinstance(sInputString, str);
+  sxInputString = oException.object;
+  sxOffensiveChars = sxInputString[oException.start: oException.end];
+  bInputIsUnicode = isinstance(sxInputString, str);
   aasConsoleOutputLines = [
     [
       guExceptionInformationColor, "Cannot decode characters in string at offset ",
@@ -10,14 +10,15 @@ def fdxExceptionDetailsForUnicodeDecodeError(oException):
       guExceptionInformationHighlightColor, fsToString(oException.reason),
       guExceptionInformationColor, ".",
     ], [
-      guExceptionInformationColor, "The offensive character", " is" if len(sOffensiveChars) == 1 else "s are", ":",
+      guExceptionInformationColor, "The offensive character", " is" if len(sxOffensiveChars) == 1 else "s are", ":",
     ], [
-      guExceptionInformationHighlightColor, "  ", fsToString(sOffensiveChars),
+      guExceptionInformationHighlightColor, "  ", fsToString(sxOffensiveChars),
     ], [
       guExceptionInformationColor, "  (Hex: ",
       guExceptionInformationHighlightColor, " ".join([
-        ("%04X" if bInputIsUnicode else "%02X") % ord(sChar)
-        for sChar in sOffensiveChars
+        ("%04X" % ord(xChar)) if bInputIsUnicode else # convert characters to an integer codepoints and print their hex values
+        ("%02X") % xChar # bytes are already integers; print their hex value.
+        for xChar in sxOffensiveChars
       ]),
       guExceptionInformationColor, ")",
     ], [
@@ -25,11 +26,11 @@ def fdxExceptionDetailsForUnicodeDecodeError(oException):
     ],
   ];
   # Put a caret under the location of the error.
-  sHumanReadbleInputString = fsToString(sInputString, uMaxLength = 200);
-  sHumanReadbleInputStringUpToOffensiveCharacters = fsToString(sInputString[:oException.start], uMaxLength = 200)[:-1];
+  sHumanReadbleInputString = fsToString(sxInputString, uMaxLength = 200);
+  sHumanReadbleInputStringUpToOffensiveCharacters = fsToString(sxInputString[:oException.start], uMaxLength = 200)[:-1];
   if len(sHumanReadbleInputStringUpToOffensiveCharacters) < 1000:
-    sHumanReadbleOffensiveCharacters = fsToString(sOffensiveChars, uMaxLength = 200)[1:-1];
-    sHumanReadbleInputStringAfterOffensiveCharacters = fsToString(sInputString[oException.end:], uMaxLength = 200)[1:];
+    sHumanReadbleOffensiveCharacters = fsToString(sxOffensiveChars, uMaxLength = 200)[1:-1];
+    sHumanReadbleInputStringAfterOffensiveCharacters = fsToString(sxInputString[oException.end:], uMaxLength = 200)[1:];
     # Show input string with offensive characters highlighted.
     aasConsoleOutputLines.append(
       [
@@ -42,8 +43,8 @@ def fdxExceptionDetailsForUnicodeDecodeError(oException):
     # String is too large to show additional useful information:
     aasConsoleOutputLines.append(
       [
-        guExceptionInformationColor, "  ", fsToString(sInputString, 1000),
-     ],
+        guExceptionInformationColor, "  ", fsToString(sxInputString, 1000),
+      ],
     );
   
   return {
