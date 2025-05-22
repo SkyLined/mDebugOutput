@@ -1,6 +1,6 @@
 
 def fdxExceptionDetailsForAssertionError(oException):
-  if len(oException.args) != 1:
+  if len(oException.args) != 1 or type(oException.args[0]) != str:
     return {};
   return {
     "aasConsoleOutputLines": [

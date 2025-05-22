@@ -25,6 +25,17 @@ def fdxExceptionDetailsForAttributeError(oException):
         return {};
       (sObjectName, sAttributeName) = oModuleErrorMessageMatch.groups();
       sObjectType = "module";
+  try:
+    sException = repr(oException.obj);
+  except:
+    sException = "".join([
+      "<",
+      oException.__class__.__module__,
+      ".",
+      oException.__class__.__name__,
+      " ",
+      "<details not available>"
+    ]);
   return {
     "aasConsoleOutputLines": [
       [
@@ -34,7 +45,7 @@ def fdxExceptionDetailsForAttributeError(oException):
         guExceptionInformationColor, "."
       ], [
         guExceptionInformationHighlightColor, sObjectType, ": ",
-        guExceptionInformationHighlightColor, repr(oException.obj),
+        guExceptionInformationHighlightColor, sException,
         guExceptionInformationColor, "."
       ],
     ],
