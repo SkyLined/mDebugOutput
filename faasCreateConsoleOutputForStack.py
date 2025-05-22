@@ -186,7 +186,10 @@ def faasCreateConsoleOutputForStack(oStack, oException = None, bAddHeader = True
     elif hasattr(oException, "message"):
       sException = "%s(%s)" % (oException.__class__.__name__, ", ".join(repr(xArg) for xArg in oException.args));
     else:
-      sException = repr(oException);
+      try:
+        sException = repr(oException);
+      except Exception as oInternalException:
+        sException = "<%s %s>" % (oException.__class__.__name__, repr(oInternalException));
     # Exception
     asExceptionLines = sException.split("\n");
     uLineNumber = 0;
