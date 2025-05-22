@@ -1,12 +1,11 @@
 import inspect, sys;
 
-gbDebugOutput = True;
+gbDebugOutput = False;
 
 def fsGetClassAndFunctionForClassAndCode(cClass, oCode):
   sFunctionName = oCode.co_name;
   sCodeFileName = oCode.co_filename;
-  asLog = [];
-  if gbDebugOutput: asLog.append("Looking for %s (%s from %s)" % (repr(oCode), sFunctionName, sCodeFileName));
+  if gbDebugOutput: print("Looking for %s (%s from %s)" % (repr(oCode), sFunctionName, sCodeFileName));
   
   def foGetCodeForFunction(xPotentialFunction):
     if not callable(xPotentialFunction):
@@ -17,32 +16,31 @@ def fsGetClassAndFunctionForClassAndCode(cClass, oCode):
       return fxWrappedFunction.__code__;
     return getattr(xPotentialFunction, "func_code", None);
   
-  def fszGetCallDescriptorForClassAndAttribute(cPotentialClass, xAttribute):
-    if oCode is foGetCodeForFunction(xAttribute): # function
+  def fszGetCallDescriptorForClassAndAttribute(cPotentialClass, sAttributeName, xAttributeValue):
+    if oCode is foGetCodeForFunction(xAttributeValue): # function
       return "%s.%s" % (cPotentialClass.__name__, sFunctionName)
     
-    oMethodFunctionCode = foGetCodeForFunction(getattr(xAttribute, "__func__", None));
+    oMethodFunctionCode = foGetCodeForFunction(getattr(xAttributeValue, "__func__", None));
     if oMethodFunctionCode:
       if oCode is oMethodFunctionCode: # (class/static)method
         return "%s.%s" % (cPotentialClass.__name__, sFunctionName)
-      if gbDebugOutput: asLog.append("%s.%s -> method = %s" % (cPotentialClass.__name__, sFunctionName, repr(oMethodFunctionCode)));
+      if gbDebugOutput: print("%s.%s -> method = %s" % (cPotentialClass.__name__, sFunctionName, repr(oMethodFunctionCode)));
       return None;
-    oGetterCode = foGetCodeForFunction(getattr(xAttribute, "fget", None));
+    oGetterCode = foGetCodeForFunction(getattr(xAttributeValue, "fget", None));
     if oCode is oGetterCode: # property getter
       return "%s.get:%s" % (cPotentialClass.__name__, sFunctionName)
-    oSetterCode = foGetCodeForFunction(getattr(xAttribute, "fset", None));
+    if gbDebugOutput and oGetterCode: print("%s.get %s -> %s" % (cPotentialClass.__name__, sFunctionName, repr(oGetterCode)));
+    oSetterCode = foGetCodeForFunction(getattr(xAttributeValue, "fset", None));
     if oCode is oSetterCode: # property setter
       return "%s.set:%s" % (cPotentialClass.__name__, sFunctionName)
-    oDeleterCode = foGetCodeForFunction(getattr(xAttribute, "fdel", None));
+    if gbDebugOutput and oSetterCode: print("%s.set %s -> %s" % (cPotentialClass.__name__, sFunctionName, repr(oSetterCode)));
+    oDeleterCode = foGetCodeForFunction(getattr(xAttributeValue, "fdel", None));
     if oCode is oDeleterCode: # property deleter
       return "%s.delete:%s" % (cPotentialClass.__name__, sFunctionName)
+    if gbDebugOutput and oDeleterCode: print("%s.delete %s -> %s" % (cPotentialClass.__name__, sFunctionName, repr(oDeleterCode)));
     if oGetterCode or oSetterCode or oDeleterCode:
-      if gbDebugOutput: 
-        if oGetterCode: asLog.append("%s.get %s -> %s" % (cPotentialClass.__name__, sFunctionName, repr(oGetterCode)));
-        if oSetterCode: asLog.append("%s.get %s -> %s" % (cPotentialClass.__name__, sFunctionName, repr(oSetterCode)));
-        if oDeleterCode: asLog.append("%s.get %s -> %s" % (cPotentialClass.__name__, sFunctionName, repr(oDeleterCode)));
-      return;
-    if gbDebugOutput: asLog.append("%s.%s -> unhandled %s" % (cPotentialClass.__name__, sFunctionName, repr(xAttribute)));
+      return None;
+    if gbDebugOutput: print("%s.%s -> unhandled %s" % (cPotentialClass.__name__, sFunctionName, repr(sAttributeName)));
     return None;
   atxPotentialClassesAndAttributeNames = [];
   acUnprocessedClasses = [cClass];
@@ -53,7 +51,7 @@ def fsGetClassAndFunctionForClassAndCode(cClass, oCode):
         acUnprocessedClasses.append(cBaseClass);
     sClassFilename = getattr(sys.modules.get(cUnprocessedClass.__module__), "__file__", None);
     if sClassFilename != sCodeFileName:
-      if gbDebugOutput: asLog.append("%s -> source file is %s" % (cUnprocessedClass.__name__, sClassFilename));
+      if gbDebugOutput: print("%s -> source file is %s" % (cUnprocessedClass.__name__, sClassFilename));
       continue;
     sMangledFunctionName = "_%s_%s" % (cUnprocessedClass.__name__, sFunctionName[1:]) if sFunctionName.startswith("__") else None;
     if hasattr(cUnprocessedClass, sFunctionName):
@@ -61,11 +59,11 @@ def fsGetClassAndFunctionForClassAndCode(cClass, oCode):
     elif sMangledFunctionName:
       atxPotentialClassesAndAttributeNames.insert(0, (cUnprocessedClass, sMangledFunctionName));
     else:
-      if gbDebugOutput: asLog.append("%s.%s -> not found" % (cUnprocessedClass.__name__, sFunctionName));
+      if gbDebugOutput: print("%s.%s -> not found" % (cUnprocessedClass.__name__, sFunctionName));
       continue;
   for (cPotentialClass, sAttributeName) in atxPotentialClassesAndAttributeNames:
-    xAttribute = getattr(cPotentialClass, sAttributeName);
-    szCallDescriptor = fszGetCallDescriptorForClassAndAttribute(cPotentialClass, xAttribute);
+    xAttributeValue = getattr(cPotentialClass, sAttributeName);
+    szCallDescriptor = fszGetCallDescriptorForClassAndAttribute(cPotentialClass, sAttributeName, xAttributeValue);
     if szCallDescriptor: return szCallDescriptor;
   return "%s?.%s" % (cClass.__name__, sFunctionName);
 

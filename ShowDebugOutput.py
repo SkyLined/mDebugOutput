@@ -1,10 +1,37 @@
 import functools, inspect, sys, threading, time;
 
+from .fRecursionGuard import fRecursionGuard;
+
 gbShowInternalDebugOutput = False;
 guExceptionAsStringMaxSize = 400;
 guArgumentAsStringMaxSize = 200;
 guReturnValueAsStringMaxSize = 400;
 guExitCodeInternalError = 1; # This is the common default I use. There's currently no good way to set this per application.
+gdafRecursionDetectionFunctions_by_uThreadId = {};
+
+class cShowDebugOutputRecursionException(Exception):
+  pass;
+
+def fStartDetectInfiniteRecursion(o0PythonThread, fxFunction):
+  if not o0PythonThread: return
+  if o0PythonThread.ident not in gdafRecursionDetectionFunctions_by_uThreadId:
+    gdafRecursionDetectionFunctions_by_uThreadId[o0PythonThread.ident] = [
+      fxFunction,
+    ];
+    return;
+  afRecursionDetectionFunctions = gdafRecursionDetectionFunctions_by_uThreadId[o0PythonThread.ident];
+  if fxFunction in afRecursionDetectionFunctions:
+    raise cShowDebugOutputRecursionException(" -> ".join(
+      f"{fxFunction.__module__}:{fxFunction.__qualname__}"
+      for fxFunction in afRecursionDetectionFunctions
+    ));
+  afRecursionDetectionFunctions.append(fxFunction);
+
+def fEndDetectInfiniteRecursion(o0PythonThread, fxFunction):
+  afRecursionDetectionFunctions = gdafRecursionDetectionFunctions_by_uThreadId[o0PythonThread.ident];
+  assert afRecursionDetectionFunctions.pop() is fxFunction;
+  if len(afRecursionDetectionFunctions) == 0:
+    del gdafRecursionDetectionFunctions_by_uThreadId[o0PythonThread.ident];
 
 def ShowDebugOutput(fxFunction):
   sBadDecorator = {
@@ -36,23 +63,24 @@ def ShowDebugOutput(fxFunction):
       o0PythonThread = threading.current_thread();
     except:
       o0PythonThread = None;
+    fStartDetectInfiniteRecursion(o0PythonThread, fxFunction);
     try:
-      oInstance = None;
-      cClass = None;
       if gbShowInternalDebugOutput:
         print("@ CALL %s(%s, %s)" % (fxFunction.__name__, repr(txCallArgumentValues)[1:-1], repr(dxCallArgumentValues)[1:-1]));
-      if axArgumentNames:
-        if s0FirstArgumentName in dxCallArgumentValues:
-          xFirstArgumentValue = dxCallArgumentValues[s0FirstArgumentName];
-        else:
-          xFirstArgumentValue = txCallArgumentValues[0];
-        (oInstance, cClass) = ftocGetInstanceAndClassForUnknown(xFirstArgumentValue);
-        if gbShowInternalDebugOutput:
-          print("xFirstArgument: %s" % repr(xFirstArgumentValue));
-          print("oInstance: %s" % oInstance);
-          print("cClass: %s" % cClass);
-      sCallDescription = fsGetClassAndFunctionForClassAndCode(cClass, fxFunction.__code__);
-      bShowDebugOutput = fbIsDebugOutputEnabledForSourceFilePathAndClass(sSourceFilePath, cClass);
+      if axArgumentNames and s0FirstArgumentName in dxCallArgumentValues:
+        xFirstArgumentValue = dxCallArgumentValues[s0FirstArgumentName];
+      elif len(txCallArgumentValues) > 0:
+        xFirstArgumentValue = txCallArgumentValues[0];
+      else:
+        xFirstArgumentValue = None;
+      if xFirstArgumentValue is None:
+        c0Class = None;
+      elif inspect.isclass(xFirstArgumentValue):
+        c0Class = xFirstArgumentValue;
+      elif inspect.isclass(getattr(xFirstArgumentValue, "__class__", None)):
+        c0Class = xFirstArgumentValue.__class__;
+      sCallDescription = fsGetClassAndFunctionForClassAndCode(c0Class, fxFunction.__code__);
+      bShowDebugOutput = fbIsDebugOutputEnabledForSourceFilePathAndClass(sSourceFilePath, c0Class);
       # The user may be trying to pass too many arguments or non-existing 
       # keyword arguments, which leads to TypeError exceptions in inspect.getcallargs. We'll
       # filter these out:
@@ -132,12 +160,15 @@ def ShowDebugOutput(fxFunction):
           );
     except Exception as oException:
       fTerminateWithException(oException, guExitCodeInternalError);
+    finally:
+      fEndDetectInfiniteRecursion(o0PythonThread, fxFunction);
     if not bShowDebugOutput:
       return fxFunction(*txCallArgumentValues, **dxCallArgumentValues);
     nStartTime = time.time();
     try:
       xReturnValue = fxFunction(*txCallArgumentValues, **dxCallArgumentValues);
     except Exception as oException:
+      fStartDetectInfiniteRecursion(o0PythonThread, fxFunction);
       try:
         nDuration = time.time() - nStartTime;
         # We detected this in the fxFunction call above (oTraceback) but it
@@ -193,8 +224,11 @@ def ShowDebugOutput(fxFunction):
         );
       except Exception as oException:
         fTerminateWithException(oException, guExitCodeInternalError);
+      finally:
+        fEndDetectInfiniteRecursion(o0PythonThread, fxFunction);
       raise;
     else:
+      fStartDetectInfiniteRecursion(o0PythonThread, fxFunction);
       try:
         # Unfortunately, we do not know the line number where the function returned, so we cannot provide useful
         # information on that. We will show the file name and line number of the call, so you at least know where
@@ -210,6 +244,8 @@ def ShowDebugOutput(fxFunction):
         );
       except Exception as oException:
         fTerminateWithException(oException, guExitCodeInternalError);
+      finally:
+        fEndDetectInfiniteRecursion(o0PythonThread, fxFunction);
       return xReturnValue;
   fxFunctionWrapper.fxWrappedFunction = fxFunction;
   ShowDebugOutput.oFunctionWrapperCode = fxFunctionWrapper.__code__;
