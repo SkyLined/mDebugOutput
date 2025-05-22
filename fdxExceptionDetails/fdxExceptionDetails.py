@@ -66,4 +66,10 @@ def fdxExceptionDetails(oException, oTraceback):
   elif m0WindowsSDK and isinstance(oException, m0WindowsSDK.cDLL.cInvalidFunctionArgumentsException):
     return fdxExceptionDetailsFor_mWindowsSDK_cDLL_cInvalidFunctionArgumentsException(oException);
   else:
-    return {};
+    dxHiddenProperties = {};
+    for sName in ("add_note", "characters_written", "with_traceback"):
+      if hasattr(oException, sName):
+        dxHiddenProperties[sName] = getattr(oException, sName);
+    return {
+      "dxHiddenProperties": dxHiddenProperties,
+    };

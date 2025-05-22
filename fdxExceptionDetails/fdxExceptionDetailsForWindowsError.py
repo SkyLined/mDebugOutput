@@ -62,7 +62,6 @@ def fdxExceptionDetailsForWindowsError(oException):
       guExceptionInformationColor, "Second file name: \"",
       guExceptionInformationHighlightColor, str(oException.filename2), guExceptionInformationColor, "\".",
     ]);
-    
   return {
     "aasConsoleOutputLines": aasConsoleOutputLines,
     "dxHiddenProperties": {
@@ -70,13 +69,13 @@ def fdxExceptionDetailsForWindowsError(oException):
         (oException.errno, oException.strerror) if len(oException.args) == 2 else
         (oException.errno, oException.strerror, None, oException.winerror, None)
       ),
-      "with_traceback": oException.with_traceback,
       "add_note": oException.add_note,
       "errno": oException.errno,
       "filename": oException.filename,
       "filename2": oException.filename2,
       "strerror": oException.strerror,
       "winerror": oException.winerror,
+      "with_traceback": oException.with_traceback,
     },
   };
 
